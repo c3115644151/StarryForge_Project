@@ -1,0 +1,102 @@
+recipes:
+  # 字段说明:
+  # input_item: 输入物品的ID (通常为精炼物)
+  # result_item: 锻造结果物品ID
+  # min_temperature: 最小所需温度 (摄氏度)
+  # strikes_required: 需要的锻打次数 (阶段数)
+  # difficulty: 难度系数 (影响Stardust生成率和判定窗口)
+  # tier_required: 需要的锻造锤等级 (1=基础, 2=强化, 3=星陨)
+  # display_name: 在配方列表或GUI中显示的名称
+
+  # --- T1 工具/武器 ---
+  TITANS_HAMMER:
+    input_item: "COMPRESSED_CARBON"
+    result_item: "TITANS_HAMMER"
+    min_temperature: 300.0
+    strikes_required: 3
+    difficulty: 1.0
+    tier_required: 1
+    display_name: "泰坦重锤"
+
+  BRONZE_SHIELD:
+    input_item: "MALACHITE_ALLOY"
+    result_item: "BRONZE_SHIELD"
+    min_temperature: 350.0
+    strikes_required: 5
+    difficulty: 0.9
+    tier_required: 1
+    display_name: "青铜壁垒"
+
+  ROYAL_CROWN:
+    input_item: "ROYAL_BULLION"
+    result_item: "ROYAL_CROWN"
+    min_temperature: 350.0
+    strikes_required: 4
+    difficulty: 0.8
+    tier_required: 1
+    display_name: "君王权冠"
+
+  # --- T2 护甲/武器 ---
+  STAR_STEEL_CHESTPLATE:
+    input_item: "STAR_STEEL"
+    result_item: "STAR_STEEL_CHESTPLATE" 
+    min_temperature: 400.0
+    strikes_required: 8
+    difficulty: 1.2
+    tier_required: 2
+    display_name: "星陨重甲"
+    
+  FLUX_RING:
+    input_item: "FLUX_RING"
+    result_item: "OVERLOAD_RING"
+    min_temperature: 500.0
+    strikes_required: 2
+    difficulty: 1.5
+    tier_required: 2
+    display_name: "过载指环"
+
+  FROST_WAND:
+    input_item: "FROSTHEART"
+    result_item: "FROST_WAND"
+    min_temperature: 200.0
+    strikes_required: 15
+    difficulty: 1.1
+    tier_required: 2
+    display_name: "霜叹法杖"
+
+  ABYSSAL_BOOTS:
+    input_item: "ABYSSAL_MITHRIL"
+    result_item: "ABYSSAL_BOOTS"
+    min_temperature: 300.0
+    strikes_required: 14
+    difficulty: 1.0
+    tier_required: 2
+    display_name: "潮汐行者长靴"
+
+  JADE_AMULET:
+    input_item: "IMPERIAL_JADE"
+    result_item: "JADE_AMULET"
+    min_temperature: 400.0
+    strikes_required: 8
+    difficulty: 1.3
+    tier_required: 2
+    display_name: "平安扣"
+
+  SHADOW_DAGGER:
+    input_item: "GHOST_PANE"
+    result_item: "SHADOW_DAGGER"
+    min_temperature: 300.0
+    strikes_required: 10
+    difficulty: 1.4
+    tier_required: 2
+    display_name: "幽影匕首"
+
+  # --- T3 神器 ---
+  VULCAN_SWORD:
+    input_item: "VULCAN_ALLOY"
+    result_item: "VULCAN_SWORD"
+    min_temperature: 800.0 # 极高温度需求
+    strikes_required: 25
+    difficulty: 1.8
+    tier_required: 3
+    display_name: "狱火神兵"

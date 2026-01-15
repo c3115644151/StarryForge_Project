@@ -1,0 +1,167 @@
+items:
+  SEISMIC_RESONATOR:
+    material: PAPER
+    model_data: 5002
+    star: false
+  
+  UNIDENTIFIED_CLUSTER:
+    material: PAPER
+    model_data: 5001
+    star: true
+
+  # Machines
+  SLUICE_MACHINE:
+    material: PAPER
+    model_data: 5003
+    star: false
+  
+  SLUICE_MACHINE_I:
+    material: BARREL
+    model_data: 3001
+    star: false
+
+  SLUICE_MACHINE_II:
+    material: BARREL
+    model_data: 3002
+    star: false
+
+  SLUICE_MACHINE_III:
+    material: BARREL
+    model_data: 3003
+    star: false
+  
+  ENCHANTED_BOOK_LITHIC_INSIGHT:
+    material: ENCHANTED_BOOK
+    model_data: 1003
+    star: false
+
+  # Materials
+  STARRY_SOLVENT:
+    material: PAPER
+    model_data: 5004
+
+  # Refined Alloys
+  COMPRESSED_CARBON:
+    material: PAPER
+    model_data: 5005
+  
+  STAR_STEEL:
+    material: PAPER
+    model_data: 5006
+  
+  ROYAL_BULLION:
+    material: PAPER
+    model_data: 5007
+  
+  FLUX_RING:
+    material: PAPER
+    model_data: 5008
+  
+  FROSTHEART:
+    material: PAPER
+    model_data: 5009
+  
+  ABYSSAL_MITHRIL:
+    material: PAPER
+    model_data: 5010
+  
+  MALACHITE_ALLOY:
+    material: PAPER
+    model_data: 5011
+  
+  IMPERIAL_JADE:
+    material: PAPER
+    model_data: 5012
+
+  GHOST_PANE:
+    material: PAPER
+    model_data: 5013
+
+  VULCAN_ALLOY:
+    material: PAPER
+    model_data: 5014
+
+  VOID_ECHO:
+    material: PAPER
+    model_data: 5015
+
+
+  # Machines - Alloy Forge
+  ALLOY_FORGE_CORE:
+    material: BLAST_FURNACE
+    model_data: 5018
+    star: false
+
+  # Machines - Astral Altar
+  ASTRAL_FORGE_NODE:
+    material: SMITHING_TABLE # Or Custom Block? using Smithing Table as base but custom model
+    model_data: 6001
+    star: false
+
+  # Tools
+  FORGING_HAMMER_T1:
+    material: IRON_PICKAXE
+    model_data: 6011
+    star: true
+  
+  FORGING_HAMMER_T2:
+    material: DIAMOND_PICKAXE 
+    model_data: 6012
+    star: true
+
+  FORGING_HAMMER_T3:
+    material: NETHERITE_PICKAXE
+    model_data: 6013
+    star: true
+
+  # Items
+  BLANK_BLUEPRINT:
+    material: PAPER
+    model_data: 6020
+    star: false
+
+  WRITTEN_BLUEPRINT:
+    material: PAPER
+    model_data: 6021
+    star: false
+
+  # Forging Artifacts (Results)
+  TITANS_HAMMER:
+    material: NETHERITE_PICKAXE
+    model_data: 4002
+    
+  STAR_STEEL_CHESTPLATE:
+    material: IRON_CHESTPLATE
+    model_data: 7001
+    
+  ROYAL_CROWN:
+    material: GOLDEN_HELMET
+    model_data: 7002
+    
+  OVERLOAD_RING:
+    material: GOLD_NUGGET
+    model_data: 7003
+    
+  FROST_WAND:
+    material: BLAZE_ROD
+    model_data: 7004
+    
+  ABYSSAL_BOOTS:
+    material: DIAMOND_BOOTS
+    model_data: 7005
+    
+  BRONZE_SHIELD:
+    material: SHIELD
+    model_data: 7006
+    
+  JADE_AMULET:
+    material: EMERALD
+    model_data: 7007
+    
+  SHADOW_DAGGER:
+    material: IRON_SWORD
+    model_data: 7008
+    
+  VULCAN_SWORD:
+    material: NETHERITE_SWORD
+    model_data: 7009

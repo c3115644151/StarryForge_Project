@@ -1,0 +1,145 @@
+# 合金高炉配方配置文件 (Alloy Blast Furnace Recipes)
+# ==========================================================
+# 
+# [配置指南]
+# 1. 产物ID: 对应 SFItemManager 中注册的物品ID或原版物品名
+#    - inputs: 原料列表，格式为 "命名空间:物品ID:数量" 或 "物品名:数量"
+#    - max_strikes: 完成熔炼所需的成功锻打次数 (默认: 5)
+#    - output_temperature: 熔炼完成时的初始温度 (默认: 1000.0)
+#    - difficulty: 难度系数 (默认: 1.0)
+#      - sweet_spot_mult: 甜蜜点宽度倍率 (越小越难击中)
+#      - heat_rate_mult: 升温速率倍率 (越高升温越快，越难控温)
+#      - cooling_mult: 冷却速率倍率 (越高降温越快)
+
+alloy_forge:
+  # 1. 压缩碳晶 (Compressed Carbon)
+  # 语义: 高压浓缩的碳元素。难度适中。
+  COMPRESSED_CARBON:
+    inputs:
+      - "minecraft:coal:4"
+      - "minecraft:charcoal:4"
+      - "biomegifts:lignite:2"
+    primary_ingredient: "BIOMEGIFTS:LIGNITE"
+    max_strikes: 6
+    output_temperature: 800.0
+    difficulty:
+      sweet_spot_mult: 0.9
+      heat_rate_mult: 1.1
+
+  # 2. 星陨钢锭 (Star Steel)
+  # 语义: 富铁矿与黑曜石的高温合金。冷却极快，需要频繁鼓风。
+  STAR_STEEL:
+    inputs:
+      - "minecraft:iron_ingot:2"
+      - "minecraft:obsidian:1"
+      - "biomegifts:rich_slag:2"
+    max_strikes: 8
+    difficulty:
+      sweet_spot_mult: 0.8
+      cooling_mult: 1.5
+    primary_ingredient: "BIOMEGIFTS:RICH_SLAG"
+
+  # 3. 皇金铸锭 (Royal Bullion)
+  # 语义: 极度纯净的黄金。甜蜜点极窄，考验精准度。
+  ROYAL_BULLION:
+    inputs:
+      - "minecraft:gold_ingot:2"
+      - "minecraft:sunflower:1"
+      - "biomegifts:gold_dust:4"
+    max_strikes: 5
+    difficulty:
+      sweet_spot_mult: 0.6
+      heat_rate_mult: 0.8
+    primary_ingredient: "BIOMEGIFTS:GOLD_DUST"
+
+  # 4. 永动通量环 (Flux Ring)
+  # 语义: 能量极其不稳定的红石聚集物。升温极快，易炸炉。
+  FLUX_RING:
+    inputs:
+      - "minecraft:redstone_block:1"
+      - "minecraft:quartz:2"
+      - "biomegifts:charged_dust:4"
+    max_strikes: 7
+    difficulty:
+      sweet_spot_mult: 1.0
+      heat_rate_mult: 1.5
+    primary_ingredient: "BIOMEGIFTS:CHARGED_DUST"
+
+  # 5. 极寒霜心 (Frostheart)
+  # 语义: 极寒能量与钻石的结合。非常稳定，但需要多次锻打成型。
+  FROSTHEART:
+    inputs:
+      - "minecraft:diamond:1"
+      - "minecraft:blue_ice:2"
+      - "biomegifts:ice_shard:2"
+    max_strikes: 10
+    difficulty:
+      sweet_spot_mult: 1.2
+      heat_rate_mult: 0.7
+    primary_ingredient: "BIOMEGIFTS:ICE_SHARD"
+
+  # 6. 深渊秘银锭 (Abyssal Mithril)
+  # 语义: 来自海洋深处的幽蓝金属。
+  ABYSSAL_MITHRIL:
+    inputs:
+      - "minecraft:iron_ingot:2"
+      - "minecraft:prismarine_crystals:4"
+      - "biomegifts:tide_essence:2"
+    max_strikes: 8
+    difficulty:
+      sweet_spot_mult: 0.9
+      cooling_mult: 1.2
+    primary_ingredient: "BIOMEGIFTS:TIDE_ESSENCE"
+
+  # 7. 青铜合金板 (Malachite Alloy)
+  # 语义: 孔雀石晶体强化的青铜。
+  MALACHITE_ALLOY:
+    inputs:
+      - "minecraft:copper_ingot:4"
+      - "minecraft:amethyst_shard:2"
+      - "biomegifts:copper_crystal:2"
+    max_strikes: 6
+    difficulty:
+      sweet_spot_mult: 1.0
+      heat_rate_mult: 1.0
+    primary_ingredient: "BIOMEGIFTS:COPPER_CRYSTAL"
+
+  # 8. 帝王玉佩 (Imperial Jade)
+  # 语义: 凝聚了高山灵气的玉石。
+  IMPERIAL_JADE:
+    inputs:
+      - "minecraft:emerald:2"
+      - "minecraft:lime_dye:1"
+      - "biomegifts:jade_shard:2"
+    max_strikes: 5
+    difficulty:
+      sweet_spot_mult: 0.7
+      heat_rate_mult: 0.9
+    primary_ingredient: "BIOMEGIFTS:JADE_SHARD"
+
+  # 9. 幽魂复合板 (Ghost Pane)
+  # 语义: 灵魂碎片与石英的压缩产物。
+  GHOST_PANE:
+    inputs:
+      - "minecraft:quartz:4"
+      - "minecraft:soul_sand:2"
+      - "biomegifts:soul_shard:2"
+    max_strikes: 7
+    difficulty:
+      sweet_spot_mult: 0.8
+      cooling_mult: 0.8
+    primary_ingredient: "BIOMEGIFTS:SOUL_SHARD"
+
+  # 10. 神锻合金块 (Vulcan Alloy)
+  # 语义: 火神之鳞与下界物质的终极融合。极端难度。
+  VULCAN_ALLOY:
+    inputs:
+      - "minecraft:nether_brick:4"
+      - "minecraft:magma_cream:2"
+      - "biomegifts:vulcan_scale:1"
+    max_strikes: 12
+    difficulty:
+      sweet_spot_mult: 0.5
+      heat_rate_mult: 1.4
+      cooling_mult: 1.3
+    primary_ingredient: "BIOMEGIFTS:VULCAN_SCALE"

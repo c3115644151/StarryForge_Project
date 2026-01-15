@@ -1,0 +1,24 @@
+name: StarryForge
+version: 1.0-SNAPSHOT
+main: com.starryforge.StarryForge
+api-version: 1.21
+depend: [NexusCore]
+softdepend: [BiomeGifts, CuisineFarming]
+description: A hardcore forging plugin adding Alloy Furnaces, Heavy Anvils, and Soul Socketing.
+commands:
+  starryforge:
+    description: Main command for StarryForge
+    aliases: [sf]
+    usage: /sf <subcommand>
+    permission: starryforge.use
+    permission-message: You do not have permission to use this command.
+permissions:
+  starryforge.use:
+    description: Allows use of the main command
+    default: true
+  starryforge.debug:
+    description: Allows use of debug features
+    default: op
+  starryforge.admin:
+    description: Allows use of admin commands (give, list)
+    default: op

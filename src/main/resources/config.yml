@@ -1,0 +1,211 @@
+# StarryForge 核心配置文件
+# 包含所有机器参数、采矿概率及多方块结构定义
+
+debug: false
+settings:
+  # 语言设置 (对应 lang/ 目录下的文件名)
+  locale: zh_CN
+
+machines:
+  alloy_forge:
+    gui:
+      # 旧的单一输入槽已被弃用，请使用 slots_input 列表
+      # slot_input: 11 
+      slots_input: [10, 11, 12]
+      slot_flux: 4
+      slot_start: 13
+      slot_output: 15
+    physics:
+      gravity: -0.15
+      boost_force: 2.5
+      max_temp: 100.0
+      sweet_spot_base_width: 10.0
+    gameplay:
+      max_strikes: 5
+      strike_cooldown_ms: 500
+      overheat_ticks: 60
+      quality_reward: 1.0
+      quality_penalty: 0.5
+    flux_modifiers:
+      NONE:
+        heat_rate: 1.0
+        sweet_spot_size: 1.0
+        sweet_spot_move_speed: 1.0
+        inertia: 0.5
+      COAL:
+        heat_rate: 0.8
+        sweet_spot_size: 1.2
+        sweet_spot_move_speed: 0.8
+        inertia: 0.8
+      BLAZE:
+        heat_rate: 1.5
+        sweet_spot_size: 0.8
+        sweet_spot_move_speed: 1.5
+        inertia: 2.0
+      SLIME:
+        heat_rate: 0.5
+        sweet_spot_size: 2.0
+        sweet_spot_move_speed: 0.2
+        inertia: 0.3
+        
+
+
+  alloy_smelter:
+    # 机器逻辑更新间隔 (Tick)
+    # 较小的值会使温度变化更平滑，但可能增加服务器负载
+    update_interval_ticks: 5
+    
+    temperature:
+      # 每次右键点击增加的基础温度
+      auto_increase_base: 5.0
+      # 每次右键点击增加的随机温度波动范围 (0 ~ value)
+      auto_increase_random: 5.0
+      # 每次左键点击降低的温度
+      cool_down_amount: 15.0
+      # 炸炉阈值：超过此温度机器将爆炸
+      max_safe: 1500.0
+      # 最佳熔炼温度区间 (在此区间内熔炼速度最快)
+      sweet_spot_min: 1000.0
+      sweet_spot_max: 1200.0
+      
+    progress:
+      # 熔炼完成所需的总进度点数
+      max: 100
+      # 在最佳温度区间内，每次更新增加的进度
+      step_sweet: 5
+      # 在普通温度区间内，每次更新增加的进度
+      step_normal: 1
+      
+  sluice:
+    # 洗矿台处理不同星级矿簇所需的时间 (秒)
+    # 键名对应矿簇的星级 (tier_1 = 1星, tier_5 = 5星)
+    processing_times:
+      tier_1: 3
+      tier_2: 7
+      tier_3: 12
+      tier_4: 16
+      tier_5: 20
+
+  astral_altar:
+    settings:
+      interaction_distance: 6.0
+      time_limit_ms: 20000
+      confirm_timeout_ms: 5000
+    
+    process:
+      nodes_per_round: 5
+      aim_threshold: 0.96
+      
+    quality:
+      max_bonus_percent: 0.10
+      penalty_base: 0.50
+      time_bonus_multiplier: 0.05
+      
+    visuals:
+      hologram_offset_y: 1.5
+      constellation_offset_y: 3.5
+
+mining:
+  # 挖掘指定方块时发现未鉴定矿簇的基础概率 (0.0 - 1.0)
+  base_chance: 0.10
+  # 拥有 "岩层勘探" 附魔时的额外概率加成
+  enchant_bonus: 0.05
+  # 如果不是在正确的岩石中挖掘，概率会乘以这个惩罚系数
+  rock_penalty: 0.1
+  
+  # 当地质谐振仪处于高频/临界状态时的概率倍率
+  resonator_bonus: 1.5
+  # 触发 resonator_bonus 所需的噪声阈值
+  resonator_threshold: 0.8
+  
+  # 可以挖掘出矿簇的方块列表
+  valid_rocks:
+    - STONE
+    - DEEPSLATE
+    - NETHERRACK
+    - END_STONE
+    - TUFF
+    - ANDESITE
+    - DIORITE
+    - GRANITE
+
+resonator:
+  # 地质谐振仪的噪声阈值设置 (基于 Perlin Noise)
+  thresholds:
+    # 临界共鸣 (最高信号)
+    critical: 0.9
+    # 高频波动
+    high: 0.7
+    # 微弱信号
+    weak: 0.3
+    # 播放高频提示音的阈值
+    sound_high: 0.8
+  # 探测更新间隔 (Tick)
+  update_interval_ticks: 40
+
+thermodynamics:
+  # 环境基础温度 (摄氏度)
+  ambient_temp: 20.0
+  # 物品自然冷却速率 (每 tick 降低的温度)
+  cooling_rate: 0.05
+  # 物品开始对玩家造成灼烧伤害的温度阈值
+  burn_threshold: 100.0
+  # 灼烧造成的最大伤害值
+  damage_cap: 10.0
+
+multiblocks:
+  alloy_blast_furnace:
+    core_offset: "1,1,1" # x,y,z (相对于结构原点)
+    layers:
+      # Layer 1 (Bottom)
+      - 
+        - "CPC"
+        - "PMP"
+        - "CPC"
+      # Layer 2 (Middle)
+      - 
+        - "PPP"
+        - "PBP"
+        - "PSP"
+      # Layer 3 (Top)
+      - 
+        - "CPC"
+        - "PCP"
+        - "CPC"
+
+    # C: 深板岩瓦 (Deepslate Tiles)
+    # P: 磨制深板岩 (Polished Deepslate)
+    # M: 岩浆块 (Magma Block)
+    # B: 高炉 (Blast Furnace) - 合金锻炉核心 (需使用带有 PDC 的自定义物品)
+    # S: 锻造台 (Smithing Table) - 交互口
+    # ' ': 空气    
+    legend:
+      C: DEEPSLATE_TILES
+      P: POLISHED_DEEPSLATE
+      M: MAGMA_BLOCK
+      B: BLAST_FURNACE
+      S: SMITHING_TABLE
+      " ": AIR
+
+  # 星魂共振祭坛 (Astral Altar)
+  astral_altar:
+    core_offset: "1,1,1" # 核心偏移量 (相对于结构原点)
+    # 结构设计：
+    # 底层：3x3 抛光深板岩底座
+    # 顶层：四周为深板岩砖墙装饰，中心为星魂共振台 (锻造台)
+    # 使用非完整方块 (围墙) 以增加通透感
+    layers:
+      - 
+        - "PPP"
+        - "PPP"
+        - "PPP"
+      - 
+        - "W W"
+        - " S "
+        - "W W"
+    legend:
+      P: POLISHED_DEEPSLATE # 抛光深板岩
+      W: DEEPSLATE_BRICK_WALL # 深板岩砖墙
+      S: SMITHING_TABLE # 星魂共振台核心
+      " ": AIR # 空气
+

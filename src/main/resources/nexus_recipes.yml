@@ -1,0 +1,17 @@
+# ==============================================================================
+# StarryForge - Nexus Recipe Configuration
+# ==============================================================================
+
+steel_ingot_recipe:
+  type: shaped
+  result:
+    item: starry-forge:steel_ingot
+    amount: 1
+  shape:
+    - " C "
+    - " I "
+  ingredients:
+    C:
+      item: minecraft:coal
+    I:
+      item: minecraft:iron_ingot

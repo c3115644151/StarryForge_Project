@@ -1,0 +1,184 @@
+messages:
+  alloy:
+    gui:
+      title: "<black>Alloy Blast Furnace"
+      start_btn_name: "<green><b>Ignite</b>"
+      start_btn_lore:
+        - "<gray>Place raw materials on the left"
+        - "<gray>Place flux on the right (Optional)"
+        - "<gray>Click to ignite"
+    already_smelting: "<red>You are already smelting!"
+    missing_material: "<yellow>Please hold raw materials (e.g. Raw Iron) and right-click the Furnace/Table to start."
+    start: "<green>Smelting started! Keep temperature between <gold>[{min_temp}°C - {max_temp}°C]<green>!"
+    flux_used: "<gray>Flux: <white>{flux}"
+    hit_success: "<green><b>CLANG!</b> <gray>({strikes}/{max_strikes})"
+    hit_fail: "<red><b>MISS!</b> <gray>Temp too low/high!"
+    hint: "<gray>Hint: Left-click to cool, Right-click to heat (Simulation)"
+    interrupted: "<red>Smelting interrupted! Structure broken."
+    explode: "<dark_red><b>EXPLOSION! Temp critical!"
+    meltdown: "<red><b>MELTDOWN!</b> Furnace exploded due to overheating!"
+    complete: "<gold>Smelting complete! Quality: "
+    actionbar: "<gray>Progress: {progress}% | Temp: {color}{temp}°C"
+  resonator:
+    toggle_on: "<green>[System] Seismic Resonator activated, scanning..."
+    toggle_off: "<red>[System] Seismic Resonator deactivated."
+    status:
+      critical: "CRITICAL RESONANCE"
+      high: "HIGH FREQUENCY"
+      weak: "WEAK SIGNAL"
+      none: "NO RESPONSE"
+    actionbar: "{color}{status} <dark_gray>[<gray>{tech_data}<dark_gray>]"
+    tech_data_format: "Δ: %.2fμT | φ: %.1f°"
+  thermodynamics:
+    burn_warning: "<red>Items in your inventory are burning you!"
+    lore_temp_prefix: "<gray>Temp: "
+    temp_format: "%.1f°C"
+  multiblock:
+    unknown_id: "<red>Error: Unknown Structure ID {id}"
+    incomplete: "<red>Structure incomplete! (Nearest Face: <gold>{face}<red>)"
+    particle_hint: "<gray>Missing/Wrong blocks marked with red particles:"
+    block_error: "<red>x: {x} y: {y} z: {z} <gray>expected <white>{expected}"
+    more_errors: "<gray>...and <red>{count} <gray>more errors."
+    complete: "<green>Structure Complete!"
+  sluice:
+    processing: "<green>Processing... {time}s"
+    waiting: "<gray>Waiting"
+    missing_material: "<red>Missing Material! Place <yellow>Unidentified Cluster<red> on the left."
+    already_running: "<yellow>Machine is running..."
+    click_to_start: "<green><b>Click to Wash</b>"
+    star: "★"
+    star_empty: "☆"
+  enchantment:
+    lithic_insight: "Lithic Insight"
+  forging:
+    gui:
+      title: "<black>Astral Forging"
+      req: "<gray>Requires: <white>{item}"
+      difficulty: "<gray>Difficulty: <white>{diff}"
+      tier: "<gray>Tier Required: <white>{tier}"
+      click: "<green><b>Click to Select</b>"
+    hammer:
+      needed: "<red>You need a Forging Hammer!"
+    blueprint:
+      already_placed: "<red>A blueprint is already placed!"
+      set: "<green>Blueprint placed. Ready for forging."
+      hint: "<gray>Right-click with material to start, or sneak-right-click to retrieve blueprint."
+      retrieve_warning: "<red>Warning: Progress will be lost!"
+      retrieve_confirm: "<red>Sneak-right-click again to confirm retrieval."
+      retrieve_cancelled: "<gray>Retrieval cancelled."
+      retrieve_empty: "<green>Blueprint retrieved."
+    anvil:
+      no_blueprint: "<red>No blueprint on the altar."
+    process:
+      finished: "<gold>Forging Complete! Quality: <white>{score}"
+  items:
+    sluice_machine:
+      base:
+        name: "<gold>Sluice Box"
+        lore:
+          - "<gray>Used for washing unidentified clusters."
+          - "<gray>Use with solvent for best results."
+      tier_1:
+        name: "<green>Basic Sluice Box (Tier I)"
+        lore:
+          - "<gray>Simple mineral processing unit"
+          - "<gray>Low efficiency, 1 output slot"
+          - "<dark_gray>Requires: 1000mB Water"
+      tier_2:
+        name: "<aqua>Advanced Sluice Box (Tier II)"
+        lore:
+          - "<gray>Improved mineral processing unit"
+          - "<gray>Medium efficiency, 4 output slots"
+          - "<dark_gray>Requires: 800mB Water"
+      tier_3:
+        name: "<gold>Expert Sluice Box (Tier III)"
+        lore:
+          - "<gray>Precision mineral processing unit"
+          - "<gray>High efficiency, 9 output slots"
+          - "<dark_gray>Requires: 500mB Water"
+    enchanted_book:
+      lithic_insight:
+        name: "<yellow>Enchanted Book"
+        lore:
+          - "<gray>For mining tools."
+          - "<gray>Grants ability to see rock structures."
+          - "<gray>Chance to find hidden clusters when mining."
+    seismic_resonator:
+      name: "<gray>Seismic Resonator"
+      lore:
+        - "<gray>Detects deep geological fluctuations."
+        - "<gray>Right-click to toggle scan mode."
+    unidentified_cluster:
+      name: "<gray>Unidentified Cluster"
+      lore:
+        - "<dark_gray>Mineral clump wrapped in heavy rock."
+        - "<dark_gray>Needs washing to reveal contents."
+    starry_solvent:
+      name: "<aqua>Starry Solvent"
+      lore:
+        - "<gray>Purifying liquid with starlight power."
+        - "<gray>Increases mineral quality during washing."
+    compressed_carbon:
+      name: "<gray>Compressed Carbon"
+      lore:
+        - "<gray>High-density carbon crystal."
+        - "<gray>Used for high-strength tool handles."
+    star_steel:
+      name: "<aqua>Star Steel"
+      lore:
+        - "<gray>Special steel shimmering with starlight."
+        - "<gray>Extremely hard, ideal for heavy armor."
+    royal_bullion:
+      name: "<gold>Royal Bullion"
+      lore:
+        - "<gray>High-purity royal gold."
+        - "<gray>Radiates an aura of majesty."
+    flux_ring:
+      name: "<yellow>Flux Ring"
+      lore:
+        - "<gray>Ring surging with unstable energy."
+        - "<gray>Used for charged devices."
+    frostheart:
+      name: "<b:aqua>Frostheart"
+      lore:
+        - "<gray>Core that never melts."
+        - "<gray>Freezing to the touch."
+    abyssal_mithril:
+      name: "<dark_aqua>Abyssal Mithril"
+      lore:
+        - "<gray>High-pressure metal from the deep sea."
+        - "<gray>Excellent magical conductivity."
+    malachite_alloy:
+      name: "<green>Malachite Alloy"
+      lore:
+        - "<gray>Specially treated copper alloy."
+        - "<gray>Has a beautiful oxidized layer."
+    imperial_jade:
+      name: "<green>Imperial Jade"
+      lore:
+        - "<gray>Warm and gentle amulet."
+        - "<gray>Said to block fatal damage."
+  debug:
+    name: "<gold>🔧 Debug Stick"
+    lore:
+      - "<gray>L-Click: Block/Vein Info"
+      - "<gray>R-Click: Held Item Data"
+      - "<dark_gray>Shift+R: Switch Mode (WIP)"
+    given: "<green>Debug Stick Given!"
+    no_permission: "<red>No permission."
+    block_info_header: "<gold>=== Block Info ==="
+    block_type: "<gray>Type: <white>{type}"
+    block_location: "<gray>Loc: <white>{x}, {y}, {z}"
+    offhand_info_header: "<gold>=== Offhand Data ==="
+    offhand_type: "<gray>Type: <white>{type}"
+    offhand_model_data: "<gray>ModelData: <white>{data}"
+    pdc_header: "<gold>-- PDC Keys --"
+    pdc_entry: "<gray>{key}: <white>{value}"
+  commands:
+    usage_give: "<red>Usage: /sf give <item_id>"
+    given: "<green>Given: <white>{item}"
+    unknown_item: "<red>Unknown Item ID: <white>{id}"
+    list_header: "<gold>=== StarryForge Items ==="
+    list_item_tooltip: "<green>Click to Get"
+    no_console: "<red>Player only."
+    visualize_noise_start: "<green>Generating noise visualization field..."
