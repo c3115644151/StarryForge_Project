@@ -17,9 +17,9 @@ public final class Keys {
     // Item Management
     // Delegated to NexusCore for standardization
     public static final String ITEM_ID_KEY_STRING = "sf_item_id"; // Legacy string keep for internal use if needed
-    public static final NamespacedKey ITEM_ID_KEY = com.nexuscore.api.NexusKeys.ITEM_ID;
-    public static final NamespacedKey CLUSTER_QUALITY_KEY = com.nexuscore.api.NexusKeys.QUALITY;
-    public static final NamespacedKey ORE_STAR_KEY = com.nexuscore.api.NexusKeys.STAR_RATING;
+    public static final NamespacedKey ITEM_ID_KEY = com.nexuscore.util.NexusKeys.ITEM_ID;
+    public static final NamespacedKey CLUSTER_QUALITY_KEY = com.nexuscore.util.NexusKeys.QUALITY;
+    public static final NamespacedKey ORE_STAR_KEY = com.nexuscore.util.NexusKeys.STAR_RATING;
 
     // Sluice Machine
     public static final NamespacedKey SLUICE_MACHINE = create("sf_sluice_machine");

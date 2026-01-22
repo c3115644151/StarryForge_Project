@@ -34,9 +34,6 @@ import java.util.UUID;
  */
 public class ForgingListener implements Listener {
 
-    private static final long RETRIEVE_CONFIRM_TIMEOUT_MS = 5000;
-    private static final long RETRIEVE_CONFIRM_TIMEOUT_TICKS = RETRIEVE_CONFIRM_TIMEOUT_MS / 50;
-
     private final StarryForge plugin;
     private final ForgingManager manager;
     private final ForgingRecipeManager recipeManager;

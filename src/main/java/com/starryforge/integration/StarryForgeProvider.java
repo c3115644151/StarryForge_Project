@@ -1,6 +1,6 @@
 package com.starryforge.integration;
 
-import com.nexuscore.api.NexusItemProvider;
+import com.nexuscore.items.NexusItemProvider;
 import com.starryforge.StarryForge;
 import org.bukkit.inventory.ItemStack;
 import java.util.List;
@@ -11,8 +11,8 @@ import org.bukkit.event.server.PluginEnableEvent;
 
 import com.starryforge.features.core.PDCManager;
 import com.starryforge.utils.Keys;
-import com.nexuscore.api.NexusRecipe;
-import com.nexuscore.api.RecipeType;
+import com.nexuscore.items.RecipeDisplay;
+import com.nexuscore.items.RecipeType;
 import org.bukkit.Material;
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public class StarryForgeProvider implements NexusItemProvider, Listener {
     }
 
     @Override
-    public NexusRecipe getRecipe(ItemStack item) {
+    public RecipeDisplay getRecipe(ItemStack item) {
         String id = PDCManager.getString(item, Keys.ITEM_ID_KEY);
 
         // 1. Check Alloy Recipes
@@ -62,7 +62,7 @@ public class StarryForgeProvider implements NexusItemProvider, Listener {
                 for (com.starryforge.features.alloy.AlloyManager.AlloyRecipe r : alloyManager.getRecipes()) {
                     if ((id != null && id.equalsIgnoreCase(r.resultId()))
                             || (id == null && item.getType().name().equalsIgnoreCase(r.resultId()))) {
-                        NexusRecipe nr = new NexusRecipe(RecipeType.ALLOY);
+                        RecipeDisplay nr = new RecipeDisplay(RecipeType.ALLOY);
                         int slot = 0;
                         for (Map.Entry<String, Integer> entry : r.inputs().entrySet()) {
                             ItemStack ing = plugin.getItemManager().getItem(entry.getKey());
@@ -91,7 +91,7 @@ public class StarryForgeProvider implements NexusItemProvider, Listener {
                         .values()) {
                     if ((id != null && id.equalsIgnoreCase(r.getResultItem()))
                             || (id == null && item.getType().name().equalsIgnoreCase(r.getResultItem()))) {
-                        NexusRecipe nr = new NexusRecipe(RecipeType.ASTRAL);
+                        RecipeDisplay nr = new RecipeDisplay(RecipeType.ASTRAL);
                         ItemStack input = plugin.getItemManager().getItem(r.getInputItem());
                         if (input == null) {
                             Material mat = Material.matchMaterial(r.getInputItem());
@@ -108,7 +108,7 @@ public class StarryForgeProvider implements NexusItemProvider, Listener {
         } catch (Exception e) {
         }
 
-        return new NexusRecipe(RecipeType.NONE);
+        return new RecipeDisplay(RecipeType.NONE);
     }
 
     @EventHandler

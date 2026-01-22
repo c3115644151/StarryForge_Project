@@ -1,0 +1,149 @@
+# StarryForge 传奇武器配置文件
+
+frostsigh:
+  # 最大蓄力时间 (ticks)
+  # 超过此时间将导致玩家脱力
+  max_hold_ticks: 300
+  
+  # 技能冷却时间 (毫秒)
+  cooldown_ms: 8000
+  
+  # 蓄力阶段阈值 (占最大蓄力时间的百分比 0.0 - 1.0)
+  thresholds:
+    ready_percent: 0.10  # 准备就绪阶段 (可以释放基础技能)
+    power_percent: 0.33  # 充能阶段 (伤害/距离提升)
+    warn_percent: 0.83   # 警告阶段 (即将脱力)
+    
+  # 技能伤害倍率 (基于物品基础攻击力)
+  damage_multipliers:
+    ready: 2.5      # 基础蓄力释放倍率
+    empowered: 3.5  # 完美蓄力释放倍率
+    
+  # 突进距离 (格)
+  # 最终距离 = 基础距离 + 物品的攻击范围属性(ATTACK_RANGE)
+  dash_distance:
+    base: 12.0      # 基础蓄力突进距离
+    empowered: 18.0 # 完美蓄力突进距离
+    
+  # 被动技能: 冰霜印记
+  passive:
+    base_chance: 0.10       # 1星时的触发概率 (10%)
+    chance_per_star: 0.0375 # 每提升1星增加的概率 (5星时约为 25%)
+    stack_limit: 10         # 最大叠加层数
+    decay_ms: 10000         # 印记自然衰减时间 (毫秒)
+    freeze_ticks_maintain: 150 # 冻结效果维持的 tick 数 (140+ 才会造成原版冻伤)
+    scaling_damage_per_stack: 0.5 # 每层印记提供的额外 DoT 伤害
+    dot_interval_ticks: 40  # DoT 伤害触发间隔 (ticks)
+    scaling_damage_offset_ticks: 20 # DoT 伤害相对于原版冻伤的偏移量 (用于错开伤害跳字)
+    
+    # 终结技(Shatter) 伤害加成
+    # 最终伤害 = 基础技能伤害 * (1.0 + (印记层数 * 每层倍率))
+    shatter_bonus_per_stack: 0.5    # 每层印记增加 50% 最终伤害 (10层 = +500% = 6.0x)
+
+  # 基础属性配置 (覆盖 items.yml)
+  stats:
+    star_1:
+      attack_damage: 7.0
+      attack_speed: 1.6
+      critical_chance: 5.0
+      critical_damage: 1.5
+    star_2:
+      attack_damage: 7.5
+      attack_speed: 1.6
+      critical_chance: 7.0
+      critical_damage: 1.5
+    star_3:
+      attack_damage: 8.0
+      attack_speed: 1.7
+      critical_chance: 10.0
+      critical_damage: 1.5
+    star_4:
+      attack_damage: 8.5
+      attack_speed: 1.8
+      critical_chance: 12.0
+      critical_damage: 1.5
+    star_5:
+      attack_damage: 10.0
+      attack_speed: 2.0
+      critical_chance: 15.0
+      critical_damage: 1.5
+
+shadow_dagger:
+  # 技能冷却时间 (秒)
+  cooldown_s: 60.0
+  
+  # 主动技能: 血影遁 (Void Step)
+  void_step:
+    # 各星级效果配置
+    star_1:
+      duration_ticks: 40  # 持续时间 (2秒)
+      speed_amp: 1        # 速度等级 (速度 II)
+    star_2:
+      duration_ticks: 60  # 3秒
+      speed_amp: 2        # 速度 III
+    star_3:
+      duration_ticks: 70  # 3.5秒
+      speed_amp: 3        # 速度 IV
+    star_4:
+      duration_ticks: 100 # 5秒
+      speed_amp: 3        # 速度 IV
+    star_5:
+      duration_ticks: 120 # 6秒
+      speed_amp: 4        # 速度 V
+      
+    # 受到伤害打破隐身的保护时间 (毫秒)
+    # 在此时间内受到伤害不会解除隐身
+    damage_break_threshold_ms: 2000
+    
+    # 心跳音效/视觉反馈频率配置
+    # 随着技能即将结束，心跳会变快
+    heartbeat:
+      fast_threshold_ticks: 40   # 剩余时间小于此值时进入"快"节奏
+      medium_threshold_ticks: 80 # 剩余时间小于此值时进入"中"节奏
+      interval_fast: 8    # 快节奏间隔 (ticks)
+      interval_medium: 9  # 中节奏间隔 (ticks)
+      interval_slow: 10   # 慢节奏间隔 (ticks)
+      
+  # 被动技能: 背刺 (Backstab)
+  backstab:
+    # 角度阈值 (向量点积)
+    # 1.0 = 完全同向, 0.0 = 垂直, -1.0 = 面对面
+    # 0.6 大约对应背后 106 度扇形区域
+    angle_threshold: 0.6 
+    
+    # 暴击伤害保底倍率
+    # 如果物品没有暴击伤害属性，则使用此默认值
+    crit_fallback: 1.5
+
+  # 基础属性配置
+  stats:
+    star_1:
+      attack_damage: 4.0
+      attack_speed: 2.0
+      critical_chance: 10.0
+      critical_damage: 1.5
+      attack_range: 2.5
+    star_2:
+      attack_damage: 4.5
+      attack_speed: 2.1
+      critical_chance: 10.0
+      critical_damage: 1.6
+      attack_range: 2.5
+    star_3:
+      attack_damage: 5.0
+      attack_speed: 2.3
+      critical_chance: 10.0
+      critical_damage: 1.8
+      attack_range: 2.5
+    star_4:
+      attack_damage: 6.0
+      attack_speed: 2.5
+      critical_chance: 10.0
+      critical_damage: 2.0
+      attack_range: 2.5
+    star_5:
+      attack_damage: 6.0
+      attack_speed: 3.0
+      critical_chance: 20.0
+      critical_damage: 2.5
+      attack_range: 2.5

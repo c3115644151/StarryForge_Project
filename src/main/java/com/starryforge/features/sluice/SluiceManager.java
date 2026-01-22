@@ -54,7 +54,6 @@ public class SluiceManager implements Listener {
         int stars;
         boolean hasSolvent;
         int tier;
-        long lastTickTime; // 用于计算离线时间
 
         public SluiceSession(int time, int maxTime, int stars, boolean hasSolvent, int tier) {
             this.time = time;
@@ -62,7 +61,6 @@ public class SluiceManager implements Listener {
             this.stars = stars;
             this.hasSolvent = hasSolvent;
             this.tier = tier;
-            this.lastTickTime = System.currentTimeMillis();
         }
     }
 
@@ -150,7 +148,6 @@ public class SluiceManager implements Listener {
 
     // 核心逻辑
     private boolean tickSession(Location loc, SluiceSession session, Inventory inv, Barrel barrel, boolean isLive) {
-        session.lastTickTime = System.currentTimeMillis();
         boolean dirty = false;
         boolean needsSave = false; // 是否需要写入世界
 
@@ -423,14 +420,11 @@ public class SluiceManager implements Listener {
                     SluiceSession session = loadSessionFromPdc(pdc);
                     Location loc = state.getLocation();
 
-                    // 模拟离线进度
                     if (pendingSessions.containsKey(loc)) {
-                        session = pendingSessions.remove(loc);
-                        simulateOfflineProgress(loc, session, (Barrel) state);
-                    }
-
-                    // 关键修复：如果 session 在模拟中已停止，不添加到活跃列表
-                    if (isProcessing(loc)) {
+                        // Restore from pending (memory)
+                        activeSessions.put(loc, pendingSessions.remove(loc));
+                    } else if (!activeSessions.containsKey(loc)) {
+                        // Initial load from disk - JUST LOAD, NO SIMULATION
                         activeSessions.put(loc, session);
                     }
                 }
@@ -472,16 +466,13 @@ public class SluiceManager implements Listener {
                 Location loc = state.getLocation();
                 if (pendingSessions.containsKey(loc)) {
                     SluiceSession session = pendingSessions.remove(loc);
-                    simulateOfflineProgress(loc, session, (Barrel) state);
-
-                    // 关键修复：如果 session 在模拟中已停止，不添加到活跃列表
-                    if (isProcessing(loc)) {
-                        activeSessions.put(loc, session);
-                    }
+                    // Just resume, no simulation
+                    activeSessions.put(loc, session);
                 } else {
                     PersistentDataContainer pdc = ((Barrel) state).getPersistentDataContainer();
                     if (pdc.has(Keys.SLUICE_PROCESSING_TIME, PersistentDataType.INTEGER)) {
                         SluiceSession session = loadSessionFromPdc(pdc);
+                        // Just resume, no simulation
                         activeSessions.put(loc, session);
                     }
                 }
@@ -500,61 +491,6 @@ public class SluiceManager implements Listener {
                 pendingSessions.put(entry.getKey(), session);
                 it.remove();
             }
-        }
-    }
-
-    private void simulateOfflineProgress(Location loc, SluiceSession session, Barrel barrel) {
-        long now = System.currentTimeMillis();
-        long elapsedMillis = now - session.lastTickTime;
-        int elapsedSeconds = (int) (elapsedMillis / 1000);
-
-        if (elapsedSeconds <= 0)
-            return;
-
-        LogUtil.debug("Simulating offline progress for sluice at " + loc + ": " + elapsedSeconds + "s");
-
-        if (elapsedSeconds > 3600)
-            elapsedSeconds = 3600;
-
-        Inventory inv = barrel.getInventory();
-        boolean dirty = false;
-
-        while (elapsedSeconds > 0) {
-            if (session.time > elapsedSeconds) {
-                session.time -= elapsedSeconds;
-                elapsedSeconds = 0;
-                dirty = true; // 时间变了 (虽然 GUI 可能看不见，但逻辑上变了)
-            } else {
-                elapsedSeconds -= session.time;
-                session.time = 0;
-
-                // 模拟完成周期
-                ItemStack loot = generateLoot(session.stars, session.hasSolvent);
-                List<Integer> validSlots = getOutputSlotsForTier(session.tier);
-
-                if (!addItemToSlots(inv, loot, validSlots)) {
-                    loc.getWorld().dropItemNaturally(loc.clone().add(0.5, 1, 0.5), loot);
-                } else {
-                    dirty = true;
-                }
-
-                // 尝试开始下一轮 (模拟)
-                if (!tryStartNextCycle(loc, session, inv, barrel)) {
-                    stopSession(loc, inv, barrel);
-                    dirty = true;
-                    return; // 停止模拟
-                } else {
-                    dirty = true;
-                }
-            }
-        }
-
-        session.lastTickTime = now;
-        updateProgressBar(inv, session.time, session.maxTime);
-
-        // 关键修复：离线模拟结束后，统一更新 BlockState
-        if (dirty) {
-            barrel.update(true);
         }
     }
 

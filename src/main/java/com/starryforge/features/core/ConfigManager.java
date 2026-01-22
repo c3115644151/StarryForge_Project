@@ -15,6 +15,7 @@ public class ConfigManager {
     private FileConfiguration langConfig;
     private boolean debug;
     private FileConfiguration recipesConfig;
+    private FileConfiguration legendaryConfig;
 
     public ConfigManager(StarryForge plugin) {
         this.plugin = plugin;
@@ -30,6 +31,22 @@ public class ConfigManager {
 
         loadLang();
         loadRecipes();
+        loadLegendaryConfig();
+    }
+
+    private void loadLegendaryConfig() {
+        File legendaryFile = new File(plugin.getDataFolder(), "legendary_config.yml");
+        if (!legendaryFile.exists()) {
+            plugin.saveResource("legendary_config.yml", false);
+        }
+        legendaryConfig = YamlConfiguration.loadConfiguration(legendaryFile);
+        LogUtil.debug("Loaded legendary weapons configuration.");
+    }
+
+    public FileConfiguration getLegendaryConfig() {
+        if (legendaryConfig == null)
+            loadLegendaryConfig();
+        return legendaryConfig;
     }
 
     private void loadRecipes() {
@@ -127,5 +144,9 @@ public class ConfigManager {
 
     public int getInt(String path, int def) {
         return plugin.getConfig().getInt(path, def);
+    }
+
+    public List<java.util.Map<?, ?>> getMapList(String path) {
+        return plugin.getConfig().getMapList(path);
     }
 }

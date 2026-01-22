@@ -31,7 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.NamespacedKey;
 
-import com.nexuscore.api.NexusKeys;
+import com.nexuscore.util.NexusKeys;
 import com.starryforge.utils.Keys;
 import com.starryforge.utils.SerializationUtils;
 import com.starryforge.features.core.PDCManager;

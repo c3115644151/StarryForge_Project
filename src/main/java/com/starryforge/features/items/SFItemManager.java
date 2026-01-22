@@ -13,7 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import com.nexuscore.api.NexusKeys;
+import com.nexuscore.util.NexusKeys;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -132,14 +132,91 @@ public class SFItemManager {
 
             int modelData = section.getInt("model_data", 0);
             boolean hasStar = section.getBoolean("star", true);
+            int defaultStar = section.getInt("default_star", 1); // Allow configuring default star level
 
             ItemStack item = new ItemStack(material);
+
+            // Special handling for Greatsword: Apply 1.21 Data Components for native blocking
+            // We MUST construct the full item NBT (including Name, Lore, PDC) and apply it via modifyItemStack
+            // because standard setItemMeta() might strip unknown Data Components like 'consumable' or 'blocks_attacks'.
+            if ("greatsword".equalsIgnoreCase(key)) {
+                try {
+                    // We use custom_data (PublicBukkitValues) to store PDC keys manually.
+                    // Dynamically get the key from Keys class to ensure match with PDCManager
+                    String itemIdKey = Keys.ITEM_ID_KEY.toString(); // e.g. "nexus:item_id" or "starryforge:sf_item_id"
+                    
+                    // PublicBukkitValues expects "namespace:key": "value"
+                    // We also include legacy keys just in case
+                    String customData = "{PublicBukkitValues:{\"" + itemIdKey + "\":\"greatsword\", \"starryforge:item_id\":\"greatsword\"}}";
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(material.getKey().toString()); // minecraft:iron_sword
+                    sb.append("[");
+                    sb.append("blocks_attacks={damage_reductions:[{base:0,factor:0.5}]},");
+                    sb.append("consumable={consume_seconds:72000, animation:'block', has_consume_particles:false, can_always_use:true},");
+                    
+                    // Note: We DO NOT set custom_model_data here manually.
+                    // ItemMeta.setCustomModelData() handles it correctly and safely across versions.
+                    
+                    // Note: We DO NOT set custom_name or lore here.
+                    // We let the standard setItemMeta logic handle it below to ensure correct formatting (MiniMessage)
+                    // and to avoid JSON escaping issues in the NBT string.
+                    // We assume setItemMeta will preserve the 'blocks_attacks' and 'consumable' components.
+                    
+                    sb.append("custom_data=").append(customData);
+                    sb.append("]");
+                    
+                    String itemDef = sb.toString();
+                    // LogUtil.debug("Constructing Greatsword with NBT: " + itemDef);
+                    
+                    // 4. Generate Item
+                    @SuppressWarnings("deprecation")
+                    ItemStack tempItem = org.bukkit.Bukkit.getUnsafe().modifyItemStack(item, itemDef);
+                    item = tempItem;
+                    
+                    // 5. Allow fall-through to standard processing (Meta, PDC, Attributes)
+                    // This ensures Name/Lore are set correctly.
+                    
+                } catch (Throwable t) {
+                    plugin.getLogger().warning("Failed to apply Data Components to Greatsword: " + t.getMessage());
+                    t.printStackTrace();
+                    // Fallback to normal flow if failed
+                }
+            }
+
+            // Frostsigh Blade / Oblivion: Add consumable component for "Hold to Charge" (Iaido Stance)
+            // Removed from here to prevent overwrite by setItemMeta
+
+            // 1. Frostsigh Blade / Oblivion: Inject consumable component FIRST
+            // This is critical because modifyItemStack resets ItemMeta if we apply it later
+            if ("frost_sigh_blade".equalsIgnoreCase(key) || "frostsigh_oblivion".equalsIgnoreCase(key)) {
+                try {
+                    String itemIdKey = Keys.ITEM_ID_KEY.toString();
+                    String customData = "{PublicBukkitValues:{\"" + itemIdKey + "\":\"" + key + "\", \"starryforge:sf_item_id\":\"" + key + "\"}}";
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(material.getKey().toString());
+                    sb.append("[");
+                    // Use 'bow' animation for Charging Stance
+                    sb.append("consumable={consume_seconds:72000, animation:'bow', has_consume_particles:false, can_always_use:true},");
+                    
+                    sb.append("custom_data=").append(customData);
+                    sb.append("]");
+                    
+                    @SuppressWarnings("deprecation")
+                    ItemStack tempItem = org.bukkit.Bukkit.getUnsafe().modifyItemStack(item, sb.toString());
+                    item = tempItem;
+                    
+                } catch (Throwable t) {
+                    plugin.getLogger().warning("Failed to apply Data Components to Frostsigh: " + t.getMessage());
+                }
+            }
+
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
                 meta.displayName(mm.deserialize(name));
                 if (modelData != 0) {
                     meta.setCustomModelData(modelData);
-                    LogUtil.debug("Applied ModelData " + modelData + " to " + key);
                 }
 
                 // 设置 ID
@@ -160,8 +237,14 @@ public class SFItemManager {
                     org.bukkit.NamespacedKey starKey = new org.bukkit.NamespacedKey(plugin, "nexus_has_star");
                     meta.getPersistentDataContainer().set(starKey, PersistentDataType.INTEGER, 1);
                     
-                    // Set NexusCore Standard Rating (Default 1 for admin-spawned items)
-                    meta.getPersistentDataContainer().set(NexusKeys.STAR_RATING, PersistentDataType.INTEGER, 1);
+                    // Set NexusCore Standard Rating (Default to config value or 1)
+                    meta.getPersistentDataContainer().set(NexusKeys.STAR_RATING, PersistentDataType.INTEGER, defaultStar);
+                }
+                
+                // Add optimization flag for FrostsighListener
+                if ("frost_sigh_blade".equalsIgnoreCase(key) || "frostsigh_oblivion".equalsIgnoreCase(key)) {
+                    org.bukkit.NamespacedKey flagKey = new org.bukkit.NamespacedKey(plugin, "sf_consumable_injected");
+                    meta.getPersistentDataContainer().set(flagKey, PersistentDataType.BYTE, (byte) 1);
                 }
 
                 List<Component> lore = new ArrayList<>();
@@ -171,6 +254,8 @@ public class SFItemManager {
                 meta.lore(lore);
 
                 item.setItemMeta(meta);
+                
+                // Apply NexusCore RPG Attributes
             }
             customItems.put(key, item);
         }
@@ -341,7 +426,17 @@ public class SFItemManager {
 
     public ItemStack getItem(String key) {
         if (customItems.containsKey(key)) {
-            return customItems.get(key).clone();
+            ItemStack item = customItems.get(key).clone();
+            // Ensure attributes are up-to-date
+            try {
+                if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("NexusCore")) {
+                    com.nexuscore.NexusCore.getInstance().getRpgManager().updateItemAttributes(item);
+                }
+            } catch (Exception e) {
+                // Ignore errors during get (e.g. if NexusCore not ready)
+                plugin.getLogger().warning("[SFItemManager] Failed to update attributes for " + key + ": " + e.getMessage());
+            }
+            return item;
         }
         return null;
     }
@@ -351,7 +446,20 @@ public class SFItemManager {
     }
 
     public List<ItemStack> getAllItems() {
-        return new ArrayList<>(customItems.values());
+        List<ItemStack> items = new ArrayList<>();
+        for (ItemStack item : customItems.values()) {
+            ItemStack clone = item.clone();
+             // Ensure attributes are up-to-date
+            try {
+                if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("NexusCore")) {
+                    com.nexuscore.NexusCore.getInstance().getRpgManager().updateItemAttributes(clone);
+                }
+            } catch (Exception e) {
+                plugin.getLogger().warning("[SFItemManager] Failed to update attributes in getAllItems: " + e.getMessage());
+            }
+            items.add(clone);
+        }
+        return items;
     }
 
     public ItemStack createUnidentifiedCluster(int stars) {

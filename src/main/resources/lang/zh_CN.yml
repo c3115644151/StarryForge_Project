@@ -198,6 +198,11 @@ messages:
       lore:
         - "<gray>永不融化的极寒核心。"
         - "<gray>触碰时会感到刺骨的寒意。"
+    greatsword:
+      name: "<gradient:gold:red>大剑</gradient>"
+      lore:
+        - "<gray>黑魂风格的重型武器"
+        - "<gray>右键格挡，0.5s内触发弹反"
     abyssal_mithril:
       name: "<dark_aqua>深渊秘银锭"
       lore:
@@ -246,46 +251,84 @@ messages:
         - "<gray>锻造完成的中间产物。"
         - "<gray>需要在注灵台上进行最终定型。"
     # Forging Products
+    star_steel_helmet:
+      name: "<aqua>星陨面甲"
+      lore:
+        - "<gray>星光汇聚而成的面甲。"
+        - "<gray>能洞察黑暗中的微光。"
     star_steel_chestplate:
       name: "<aqua>星陨重甲"
       lore:
         - "<gray>由星陨钢锻造的坚固胸甲。"
         - "<gray>能有效抵御物理伤害。"
+    star_steel_leggings:
+      name: "<aqua>星陨护腿"
+      lore:
+        - "<gray>星陨钢打造的护腿。"
+        - "<gray>提供极佳的平衡性。"
+    star_steel_boots:
+      name: "<aqua>星陨战靴"
+      lore:
+        - "<gray>星陨钢战靴。"
+        - "<gray>落地时仿佛有引力缓冲。"
+        
     royal_crown:
       name: "<gold>君王权冠"
       lore:
         - "<gray>象征无上权力的皇冠。"
         - "<gray>据说是古代君王的遗物。"
+        
     overload_ring:
       name: "<red>过载指环"
       lore:
         - "<gray>充满了不稳定的能量。"
         - "<gray>能在短时间内大幅提升力量，但伴随副作用。"
-    frost_wand:
-      name: "<b:aqua>霜叹"
+        
+    frost_sigh_blade:
+      name: "<gradient:#00FFFF:#FFD700>霜叹·忘川</gradient>"
+      lore:
+        - "<gray><italic>凝结了垂死恒星最后一声叹息的冰刃。</italic>"
+        - ""
+        - "<gradient:#00FFFF:#FFFFFF>❄ 被动: 凛冬之印 (Frost Mark)</gradient>"
+        - "<gray>普攻有几率施加<aqua>冰霜印记</aqua> (最高10层)。"
+        - "<gray>印记将持续<aqua>冻结</aqua>敌人并造成<red>真实伤害</red>。"
+        - "<gray>层数越高，减速越深，冻伤越痛。"
+        - ""
+        - "<gradient:#FFD700:#FFAA00>⚡ 绝技: 断空 (Event Horizon)</gradient>"
+        - "<gray>右键蓄力进入<yellow>专注状态</yellow>，释放一次"
+        - "<gray>跨越维度的<gold>次元斩</gold>。"
+        - "<gray>若目标身负印记，将引爆所有层数，"
+        - "<gray>造成<red>毁灭性</red>的爆发。"
+    frost_sigh_wand:
+      name: "<b:aqua>霜叹·凛冬"
       lore:
         - "<gray>凝聚了极寒之力的法杖。"
         - "<gray>挥舞时周围的空气都会凝结。"
+        
     abyssal_boots:
       name: "<dark_aqua>潮汐行者长靴"
       lore:
         - "<gray>来自深渊的神秘装备。"
         - "<gray>穿戴者在水中行动自如。"
+        
     bronze_shield:
       name: "<green>青铜壁垒"
       lore:
         - "<gray>古老工艺锻造的盾牌。"
         - "<gray>虽然沉重，但防御力惊人。"
+        
     jade_amulet:
       name: "<green>平安扣"
       lore:
         - "<gray>温润如玉的护身符。"
         - "<gray>能为佩戴者带来好运。"
+        
     shadow_dagger:
       name: "<dark_purple>幽影匕首"
       lore:
         - "<gray>隐藏在暗影中的利刃。"
         - "<gray>攻击时无声无息。"
+        
     vulcan_sword:
       name: "<gradient:red:gold>狱火神兵</gradient>"
       lore:

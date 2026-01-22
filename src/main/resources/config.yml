@@ -93,8 +93,37 @@ machines:
       confirm_timeout_ms: 5000
     
     process:
-      nodes_per_round: 5
+      # 旧的简单配置已被 difficulty_tiers 取代
+      # nodes_per_round: 5
       aim_threshold: 0.96
+
+    # 锻造难度阶梯 (基于完成进度的百分比)
+    # 系统会根据 (当前轮次 / 总轮次) 的比例，自上而下匹配最合适的阶梯
+    difficulty_tiers:
+      -
+        name: "phase_1"
+        threshold: 0.0 # 0% - 33% 进度
+        nodes: 5
+        time_limit_sec: 20
+        mode: "STATIC" # STATIC (静止), ORBIT (公转), LINKED (连线 - 实验性)
+        rotation_speed: 0.0 # 公转速度 (度/tick)
+        interference_nodes: 0 # 干扰项数量 (暂未实装逻辑，仅预留)
+      -
+        name: "phase_2"
+        threshold: 0.33 # 33% - 66% 进度
+        nodes: 7
+        time_limit_sec: 18
+        mode: "ORBIT"
+        rotation_speed: 1.0
+        interference_nodes: 0
+      -
+        name: "phase_3"
+        threshold: 0.66 # 66% - 100% 进度
+        nodes: 9
+        time_limit_sec: 15
+        mode: "ORBIT"
+        rotation_speed: 2.0 # 转得更快
+        interference_nodes: 2
       
     quality:
       max_bonus_percent: 0.10
