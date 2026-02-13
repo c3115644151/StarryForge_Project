@@ -3,7 +3,6 @@ package com.starryforge.features.items.frostsigh;
 import com.starryforge.StarryForge;
 import com.nexuscore.util.NexusKeys;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

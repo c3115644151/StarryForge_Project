@@ -12,6 +12,7 @@ import com.starryforge.features.resonator.ResonatorManager;
 import com.starryforge.features.mining.MiningManager;
 import com.starryforge.features.multiblock.MultiBlockManager;
 import com.starryforge.features.alloy.AlloyManager;
+import com.starryforge.features.scrap.ScrapManager;
 import com.starryforge.features.core.DebugStickManager;
 import com.starryforge.features.sluice.SluiceListener;
 import com.starryforge.features.core.AnvilListener;
@@ -41,6 +42,8 @@ public class StarryForge extends JavaPlugin {
     private com.starryforge.features.forging.gui.BlueprintSelectionGUI blueprintGUI;
     private com.starryforge.features.forging.ForgingRecipeManager forgingRecipeManager;
     private com.starryforge.features.items.frostsigh.FrostMarkManager frostMarkManager;
+    private com.starryforge.features.scrap.ScrapManager scrapManager;
+    private com.starryforge.features.ironheart.IronHeartManager ironHeartManager;
 
     @Override
     public void onEnable() {
@@ -51,7 +54,7 @@ public class StarryForge extends JavaPlugin {
             // 初始化管理器
             LogUtil.init(this);
             this.configManager = new ConfigManager(this);
-            
+
             // FrostMarkManager (Standalone, no dependencies)
             this.frostMarkManager = new com.starryforge.features.items.frostsigh.FrostMarkManager(this);
             this.frostMarkManager.start();
@@ -91,6 +94,11 @@ public class StarryForge extends JavaPlugin {
             this.blueprintGUI = new com.starryforge.features.forging.gui.BlueprintSelectionGUI(this);
             this.debugStickManager = new DebugStickManager(this);
 
+            this.scrapManager = new com.starryforge.features.scrap.ScrapManager(this);
+
+            // IronHeart Manager (New Architecture)
+            this.ironHeartManager = new com.starryforge.features.ironheart.IronHeartManager(this);
+
             // 注册监听器
             getServer().getPluginManager().registerEvents(new GlobalDropListener(miningManager), this);
             getServer().getPluginManager().registerEvents(new AnvilListener(), this);
@@ -98,6 +106,8 @@ public class StarryForge extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new AntiExploitListener(), this);
             getServer().getPluginManager().registerEvents(new com.starryforge.features.forging.ForgingListener(this),
                     this);
+            getServer().getPluginManager()
+                    .registerEvents(new com.starryforge.features.forging.gui.BlueprintListener(this), this);
             getServer().getPluginManager().registerEvents(this.forgingManager, this);
 
             // 注册 RPG 能力 (NexusCore)
@@ -120,8 +130,6 @@ public class StarryForge extends JavaPlugin {
             getServer().getPluginManager().registerEvents(this.sluiceManager, this);
             getServer().getPluginManager().registerEvents(new SluiceListener(this.sluiceManager), this);
             getServer().getPluginManager().registerEvents(this.alloyManager, this);
-            getServer().getPluginManager().registerEvents(new com.starryforge.features.alloy.SlagRecoveryListener(this),
-                    this);
             getServer().getPluginManager().registerEvents(new com.starryforge.features.alloy.ReheatListener(this),
                     this);
             getServer().getPluginManager()
@@ -323,6 +331,10 @@ public class StarryForge extends JavaPlugin {
         return forgingRecipeManager;
     }
 
+    public com.starryforge.features.ironheart.IronHeartManager getIronHeartManager() {
+        return ironHeartManager;
+    }
+
     public ThermodynamicsManager getThermodynamicsManager() {
         return thermodynamicsManager;
     }
@@ -341,6 +353,10 @@ public class StarryForge extends JavaPlugin {
 
     public com.starryforge.features.items.frostsigh.FrostMarkManager getFrostMarkManager() {
         return frostMarkManager;
+    }
+
+    public ScrapManager getScrapManager() {
+        return scrapManager;
     }
 
     public void registerRpgComponents() {

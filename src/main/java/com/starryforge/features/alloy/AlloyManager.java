@@ -2,6 +2,8 @@ package com.starryforge.features.alloy;
 
 import com.starryforge.StarryForge;
 import com.starryforge.features.multiblock.MultiBlockManager;
+import com.starryforge.features.scrap.ScrapManager;
+import com.starryforge.utils.Keys;
 import com.starryforge.utils.LogUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -32,7 +34,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.NamespacedKey;
 
 import com.nexuscore.util.NexusKeys;
-import com.starryforge.utils.Keys;
 import com.starryforge.utils.SerializationUtils;
 import com.starryforge.features.core.PDCManager;
 
@@ -53,7 +54,8 @@ public class AlloyManager implements Listener {
             double outputTemperature,
             double sweetSpotMult,
             double heatRateMult,
-            double coolingMult) {
+            double coolingMult,
+            boolean hasQuality) {
     }
 
     private final StarryForge plugin;
@@ -207,9 +209,11 @@ public class AlloyManager implements Listener {
                         hrMult = diff.getDouble("heat_rate_mult", 1.0);
                         cMult = diff.getDouble("cooling_mult", 1.0);
                     }
+                    
+                    boolean hasQuality = section.getBoolean("has_quality", true);
 
                     if (!inputs.isEmpty()) {
-                        recipes.add(new AlloyRecipe(key, inputs, strikes, outputTemp, ssMult, hrMult, cMult));
+                        recipes.add(new AlloyRecipe(key, inputs, strikes, outputTemp, ssMult, hrMult, cMult, hasQuality));
                     }
                 }
                 LogUtil.debug("Loaded " + recipes.size() + " alloy recipes.");
@@ -284,6 +288,17 @@ public class AlloyManager implements Listener {
                 continue;
             inv.setItem(i, filler);
         }
+        
+        // Tutorial Book (Slot 26 - Top Right Corner)
+        ItemStack tutorialBook = new ItemStack(Material.KNOWLEDGE_BOOK);
+        ItemMeta bookMeta = tutorialBook.getItemMeta();
+        bookMeta.displayName(mm.deserialize("<!i><gradient:aqua:blue>合金锻造指南 (点击阅读)"));
+        bookMeta.lore(java.util.List.of(
+            mm.deserialize("<gray>了解如何操作热力冲程"),
+            mm.deserialize("<gray>以及如何避免炸炉事故。")
+        ));
+        tutorialBook.setItemMeta(bookMeta);
+        inv.setItem(26, tutorialBook);
 
         // Load Output
         ItemStack outputInfo = getOutputFromBlock(coreBlock);
@@ -324,6 +339,45 @@ public class AlloyManager implements Listener {
             // shift click logic is handled by bukkit mostly, but dragging INTO gui needs
             // care
             // for simplicity, allow interaction in player inv
+            return;
+        }
+
+        if (slot == 26) {
+            // Tutorial Book Click
+            event.setCancelled(true);
+            Player p = (Player) event.getWhoClicked();
+            p.closeInventory();
+            
+            // Send Tutorial Content
+            p.sendMessage(mm.deserialize("<gradient:aqua:blue>========== [ 合金锻造指南 ] =========="));
+            p.sendMessage(mm.deserialize("<gray>合金高炉采用独特的 <white>热力冲程</white> 机制。"));
+            p.sendMessage(mm.deserialize(""));
+            p.sendMessage(mm.deserialize("<yellow>1. 投料阶段 (Setup)"));
+            p.sendMessage(mm.deserialize("<gray>  放入 <white>矿物原料</white> 与 <white>助熔剂(Flux)</white>。"));
+            p.sendMessage(mm.deserialize("<gray>  点击 <green>[开始熔炼]</green> 按钮点火。"));
+            p.sendMessage(mm.deserialize(""));
+            p.sendMessage(mm.deserialize("<yellow>2. 动态博弈 (The Game)"));
+            p.sendMessage(mm.deserialize("<gray>  关注 Actionbar 上的温度计: <aqua>[❄ ...|==★==|... 🔥]"));
+            p.sendMessage(mm.deserialize("<gray>  <bold>目标:</bold> 当白色指针 <white>█</white> 位于金色甜蜜点 <gold>|==★==|</gold> 内时..."));
+            p.sendMessage(mm.deserialize("<gray>  <bold>动作:</bold> 对高炉核心进行 <gold>左键打击(Left Click)</gold>！"));
+            p.sendMessage(mm.deserialize("<gray>  <green>成功:</green> 积累评分，进度 +1。"));
+            p.sendMessage(mm.deserialize("<gray>  <red>失败:</red> 扣除评分，进度不变。"));
+            p.sendMessage(mm.deserialize(""));
+            p.sendMessage(mm.deserialize("<yellow>3. 控温技巧 (Temperature Control)"));
+            p.sendMessage(mm.deserialize("<gray>  <white>右键(Right Click)</white>: <red>鼓风升温</red> (指针向右加速)。"));
+            p.sendMessage(mm.deserialize("<gray>  <white>潜行(Sneak)</white>: <aqua>阻尼降温</aqua> (增大阻力，稳定指针)。"));
+            p.sendMessage(mm.deserialize(""));
+            p.sendMessage(mm.deserialize("<yellow>4. 助熔剂策略 (Flux Strategy)"));
+            p.sendMessage(mm.deserialize("<gray>  <dark_gray>煤炭:</dark_gray> 标准手感，适合新手。"));
+            p.sendMessage(mm.deserialize("<gray>  <gold>烈焰粉:</gold> 升温极快，甜蜜点宽，适合快节奏高手。"));
+            p.sendMessage(mm.deserialize("<gray>  <green>粘液球:</green> 惯性大，极难改变方向，但极其稳定。"));
+            p.sendMessage(mm.deserialize(""));
+            p.sendMessage(mm.deserialize("<red><bold>⚠ 警示 (WARNING)</bold>"));
+            p.sendMessage(mm.deserialize("<gray>  若温度进入红色危险区超过 3秒，将触发 <dark_red>炸炉(Meltdown)</dark_red>！"));
+            p.sendMessage(mm.deserialize("<gray>  炸炉会销毁所有原料并产生废渣，同时对您造成伤害。"));
+            p.sendMessage(mm.deserialize("<gradient:blue:aqua>=================================="));
+            
+            p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1.0f, 1.0f);
             return;
         }
 
@@ -425,41 +479,85 @@ public class AlloyManager implements Listener {
         if (meta != null) {
             String sfId = meta.getPersistentDataContainer().get(com.starryforge.utils.Keys.ITEM_ID_KEY,
                     org.bukkit.persistence.PersistentDataType.STRING);
-            if (sfId != null)
+            if (sfId != null) {
+                plugin.getLogger().info("DEBUG: Item has SF ID: " + sfId);
+                // Special handling for legacy/Nexus items that might not have BIOMEGIFTS prefix
+                if (sfId.equals("LIGNITE") || sfId.equals("RICH_SLAG") || sfId.equals("GOLD_DUST") || sfId.equals("CHARGED_DUST") || sfId.equals("ICE_SHARD") || sfId.equals("TIDE_ESSENCE") || sfId.equals("COPPER_CRYSTAL") || sfId.equals("JADE_SHARD")) {
+                     return "BIOMEGIFTS:" + sfId;
+                }
                 return sfId.toUpperCase();
+            }
 
             // 2. Check BiomeGifts PDC
             org.bukkit.NamespacedKey bgKey = org.bukkit.NamespacedKey.fromString("biomegifts:id");
             if (bgKey != null) {
                 String bgId = meta.getPersistentDataContainer().get(bgKey,
                         org.bukkit.persistence.PersistentDataType.STRING);
-                if (bgId != null)
+                if (bgId != null) {
+                    plugin.getLogger().info("DEBUG: Item has BG ID: " + bgId);
+                    // Check if ID already contains namespace to avoid double prefix
+                    if (bgId.toUpperCase().startsWith("BIOMEGIFTS:")) {
+                         return bgId.toUpperCase();
+                    }
                     return "BIOMEGIFTS:" + bgId.toUpperCase();
+                }
+            }
+            
+            // 3. Check NexusCore Item ID (Standard)
+            org.bukkit.NamespacedKey nexusKey = org.bukkit.NamespacedKey.fromString("nexuscore:item_id");
+            if (nexusKey != null) {
+                String nexusId = meta.getPersistentDataContainer().get(nexusKey,
+                        org.bukkit.persistence.PersistentDataType.STRING);
+                if (nexusId != null) {
+                    plugin.getLogger().info("DEBUG: Item has NexusCore ID: " + nexusId);
+                    // BiomeGifts items in NexusCore usually don't have namespace in ID value
+                    // Try to guess namespace or return raw if it looks like one
+                    if (nexusId.contains(":")) {
+                        return nexusId.toUpperCase();
+                    } else {
+                        // Assuming BiomeGifts if it's a known material? Or just return raw?
+                        // For safety, let's try to map it if we can contextually guess, 
+                        // but for now let's append BIOMEGIFTS if it matches known BG items logic
+                        // Or better yet, just return BIOMEGIFTS:ID if it matches our recipe expectation
+                        return "BIOMEGIFTS:" + nexusId.toUpperCase();
+                    }
+                }
             }
         }
 
-        // 3. Fallback to Material Name (Minecraft Namespace)
+        // 4. Fallback to Material Name (Minecraft Namespace)
+        plugin.getLogger().info("DEBUG: Item fallback to Material: " + item.getType().name());
         return item.getType().name();
     }
 
     private AlloyRecipe matchRecipe(List<ItemStack> inputs) {
         Map<String, Integer> inputCounts = new HashMap<>();
         for (ItemStack item : inputs) {
-            inputCounts.merge(getItemId(item), item.getAmount(), (a, b) -> a + b);
+            String id = getItemId(item);
+            inputCounts.merge(id, item.getAmount(), (a, b) -> a + b);
         }
+        
+        plugin.getLogger().info("DEBUG: Current Input Counts: " + inputCounts);
 
         for (AlloyRecipe recipe : recipes) {
             boolean match = true;
             for (Map.Entry<String, Integer> req : recipe.inputs().entrySet()) {
-                int has = inputCounts.getOrDefault(req.getKey().toUpperCase().replace("MINECRAFT:", ""), 0);
+                String reqKey = req.getKey().toUpperCase().replace("MINECRAFT:", "");
+                int has = inputCounts.getOrDefault(reqKey, 0);
+                
+                plugin.getLogger().info("DEBUG: Checking Recipe " + recipe.resultId() + ": Need " + reqKey + " x" + req.getValue() + ", Has x" + has);
+                
                 if (has < req.getValue()) {
                     match = false;
                     break;
                 }
             }
-            if (match)
+            if (match) {
+                plugin.getLogger().info("DEBUG: Matched Recipe: " + recipe.resultId());
                 return recipe;
+            }
         }
+        plugin.getLogger().info("DEBUG: No recipe matched.");
         return null;
     }
 
@@ -704,17 +802,24 @@ public class AlloyManager implements Listener {
 
     private void startSmelting(Player player, Block furnace, BlockFace facing, AlloyRecipe recipe, FluxType flux, List<ItemStack> inputs) {
         // Calculate raw stars from inputs (NexusCore Standard)
+        // Rule: Un-starred items (Vanilla) default to 1 Star (Standard Quality).
+        // Only explicitly 0-star items (Trash) should pull down the average.
         int totalStars = 0;
         int count = 0;
         for (ItemStack item : inputs) {
             if (item == null || item.getType() == Material.AIR) continue;
+            
+            int stars = 1; // Default to 1
             ItemMeta meta = item.getItemMeta();
             if (meta != null && meta.getPersistentDataContainer().has(NexusKeys.STAR_RATING, PersistentDataType.INTEGER)) {
-                totalStars += meta.getPersistentDataContainer().get(NexusKeys.STAR_RATING, PersistentDataType.INTEGER);
-                count++;
+                stars = meta.getPersistentDataContainer().get(NexusKeys.STAR_RATING, PersistentDataType.INTEGER);
             }
+            
+            totalStars += stars;
+            count++;
         }
-        int rawStars = count > 0 ? Math.round((float) totalStars / count) : 0;
+        // Round to nearest integer
+        int rawStars = count > 0 ? Math.round((float) totalStars / count) : 1;
 
         player.sendMessage(mm.deserialize(plugin.getConfigManager().getMessage("alloy.start")));
         player.sendMessage(
@@ -964,68 +1069,53 @@ public class AlloyManager implements Listener {
             ItemStack slagItem = createMineralSlag();
             org.bukkit.Location dropLocation = furnace.getLocation().add(0.5, 1.5, 0.5);
 
-            // Create explosion (blocks destroyed)
-            furnace.getWorld().createExplosion(furnace.getLocation(), 4.0f, false, true);
-
-            // Drop slag after a short delay to avoid being destroyed by explosion
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (slagItem != null) {
-                        dropLocation.getWorld().dropItemNaturally(dropLocation, slagItem);
-                    }
+            // Create explosion visual effect ONLY (no block destruction)
+            furnace.getWorld().createExplosion(furnace.getLocation(), 0.0f, false);
+            // Additional visual/sound effects for "Meltdown"
+            furnace.getWorld().spawnParticle(Particle.EXPLOSION_EMITTER, furnace.getLocation(), 1);
+            furnace.getWorld().spawnParticle(Particle.LAVA, furnace.getLocation(), 20, 1, 1, 1, 0.1);
+            furnace.getWorld().playSound(furnace.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.5f);
+            
+            // Damage the player slightly as feedback
+            player.damage(4.0);
+            
+            // Clear the inputs/session data from the block (effectively "consuming" them)
+            clearOutputFromBlock(furnace);
+            if (furnace.getState() instanceof org.bukkit.block.TileState state) {
+                PersistentDataContainer pdc = state.getPersistentDataContainer();
+                NamespacedKey[] keys = { Keys.ALLOY_INPUT_0, Keys.ALLOY_INPUT_1, Keys.ALLOY_INPUT_2, Keys.ALLOY_FLUX_ITEM };
+                for (NamespacedKey key : keys) {
+                    pdc.remove(key);
                 }
-            }.runTaskLater(plugin, 5L); // 5 ticks = 0.25 seconds
+                state.update();
+            }
+
+            // Drop slag
+            if (slagItem != null) {
+                dropLocation.getWorld().dropItemNaturally(dropLocation, slagItem);
+            }
 
             player.sendMessage(mm.deserialize(plugin.getConfigManager().getMessage("alloy.meltdown")));
         }
 
         private ItemStack createMineralSlag() {
-            ItemStack slag = new ItemStack(Material.CHARCOAL, 1);
-            ItemMeta meta = slag.getItemMeta();
-            if (meta == null)
-                return slag;
-
-            meta.displayName(mm.deserialize("<gray>矿物残渣"));
-
-            java.util.List<Component> lore = new java.util.ArrayList<>();
-            lore.add(mm.deserialize("<dark_gray>失败的熔炼产物"));
-            lore.add(mm.deserialize("<gray>目标物品: <white>" + recipe.resultId()));
-
-            // Find special ore from inputs and store its star rating
-            // Special ore is any ore with ORE_STAR_KEY
-            // Since we don't have access to input items in the session (they were
-            // consumed),
-            // we store the raw rawStars value as a proxy for expected quality
-            // The user stated they want special ore recovery, so let's use rawStars
-            // instead.
-            // If the user wants input-specific stars, we'd need to persist input data.
-            // For now, we'll use rawStars as the "expected star quality" of inputs.
-
-            lore.add(mm.deserialize("<gray>原始星级: <yellow>" + rawStars + "★"));
-            meta.lore(lore);
-
-            // PDC Storage
-            PersistentDataContainer pdc = meta.getPersistentDataContainer();
-            pdc.set(Keys.ITEM_ID_KEY, PersistentDataType.STRING, "MINERAL_SLAG");
-            pdc.set(Keys.SLAG_TARGET_ITEM, PersistentDataType.STRING, recipe.resultId());
-            pdc.set(Keys.SLAG_SPECIAL_ORE_STARS, PersistentDataType.INTEGER, rawStars);
-            // Amount: How much special ore to return (30-80% of input requirement)
-            // We need to calculate based on recipe. Assume first input is the "special
-            // ore".
+            // Use Unified ScrapManager
+            ScrapManager scrapManager = plugin.getScrapManager();
+            
+            // Calculate return amount (30-80% of input)
             int totalSpecialOre = recipe.inputs().values().stream().findFirst().orElse(1);
             int returnAmount = (int) Math.ceil(totalSpecialOre * (0.3 + random.nextDouble() * 0.5));
-            if (returnAmount < 1)
-                returnAmount = 1;
-            pdc.set(Keys.SLAG_SPECIAL_ORE_AMOUNT, PersistentDataType.INTEGER, returnAmount);
-            // Store the first input type as the ore type
+            if (returnAmount < 1) returnAmount = 1;
+            
             String firstInputType = recipe.inputs().keySet().stream().findFirst().orElse("UNKNOWN");
-            pdc.set(Keys.SLAG_SPECIAL_ORE_TYPE, PersistentDataType.STRING, firstInputType);
-
-            meta.setCustomModelData(1001); // Placeholder model data for slag
-
-            slag.setItemMeta(meta);
-            return slag;
+            
+            return scrapManager.createScrap(
+                ScrapManager.ScrapType.ALLOY_SLAG,
+                firstInputType,
+                recipe.resultId(), // Using result ID as target name context
+                rawStars,
+                returnAmount
+            );
         }
 
         private void finish() {
@@ -1034,14 +1124,19 @@ public class AlloyManager implements Listener {
 
             // 计算星级
             // 公式: Stars = floor(RawStars * (0.5 + 0.5 * (Score / MaxStrikes)))
-            double completionRate = Math.max(0, qualityAccumulator / recipe.maxStrikes());
-            double finalRating = rawStars * (0.5 + 0.5 * completionRate);
-            int finalStars = (int) Math.floor(finalRating);
-            if (finalStars < 1)
-                finalStars = 1;
-
-            player.sendMessage(
+            int finalStars = 1;
+            if (recipe.hasQuality()) {
+                double completionRate = Math.max(0, qualityAccumulator / recipe.maxStrikes());
+                double finalRating = rawStars * (0.5 + 0.5 * completionRate);
+                finalStars = (int) Math.floor(finalRating);
+                if (finalStars < 1) finalStars = 1;
+                
+                player.sendMessage(
                     mm.deserialize(plugin.getConfigManager().getMessage("alloy.complete") + "⭐".repeat(finalStars)));
+            } else {
+                // No quality system for this recipe
+                player.sendMessage(mm.deserialize(plugin.getConfigManager().getMessage("alloy.complete")));
+            }
 
             ItemStack result = null;
             if (plugin.getItemManager() != null) {
@@ -1060,23 +1155,25 @@ public class AlloyManager implements Listener {
             }
             result.setAmount(1);
 
-            // Apply Stars to Name
+            // Apply Stars to Name (Only if hasQuality)
             ItemMeta meta = result.getItemMeta();
 
-            // Set NexusCore Standard Rating
-            meta.getPersistentDataContainer().set(NexusKeys.STAR_RATING, PersistentDataType.INTEGER, finalStars);
+            if (recipe.hasQuality()) {
+                // Set NexusCore Standard Rating
+                meta.getPersistentDataContainer().set(NexusKeys.STAR_RATING, PersistentDataType.INTEGER, finalStars);
 
-            if (meta.hasDisplayName()) {
-                Component currentName = meta.displayName();
-                Component starsSuffix = mm.deserialize(" <yellow>" + "⭐".repeat(finalStars));
-                meta.displayName(currentName.append(starsSuffix));
-            } else {
-                Component starsSuffix = mm.deserialize(" <yellow>" + "⭐".repeat(finalStars));
-                // Clean name
-                String matName = result.getType().name().replace("_", " ");
-                // title case
-                matName = matName.substring(0, 1).toUpperCase() + matName.substring(1).toLowerCase();
-                meta.displayName(Component.text(matName).append(starsSuffix));
+                if (meta.hasDisplayName()) {
+                    Component currentName = meta.displayName();
+                    Component starsSuffix = mm.deserialize(" <yellow>" + "⭐".repeat(finalStars));
+                    meta.displayName(currentName.append(starsSuffix));
+                } else {
+                    Component starsSuffix = mm.deserialize(" <yellow>" + "⭐".repeat(finalStars));
+                    // Clean name
+                    String matName = result.getType().name().replace("_", " ");
+                    // title case
+                    matName = matName.substring(0, 1).toUpperCase() + matName.substring(1).toLowerCase();
+                    meta.displayName(Component.text(matName).append(starsSuffix));
+                }
             }
             result.setItemMeta(meta);
 

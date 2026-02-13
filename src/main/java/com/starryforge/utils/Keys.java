@@ -52,6 +52,12 @@ public final class Keys {
     public static final NamespacedKey SLAG_SPECIAL_ORE_AMOUNT = create("sf_slag_ore_amount");
     public static final NamespacedKey SLAG_SPECIAL_ORE_ITEM = create("sf_slag_ore_item");
 
+    // Scrap System (Unified)
+    public static final NamespacedKey SCRAP_TYPE = create("sf_scrap_type"); // ALLOY_SLAG, COMPONENT_SCRAP
+    public static final NamespacedKey SCRAP_SOURCE_ID = create("sf_scrap_source_id"); // Material or SF Item ID
+    public static final NamespacedKey SCRAP_QUALITY = create("sf_scrap_quality"); // Stars or Tier
+    public static final NamespacedKey SCRAP_AMOUNT = create("sf_scrap_amount"); // Recovery Amount
+
     // Thermodynamics - Last Update Time for Lazy Cooling
     public static final NamespacedKey LAST_UPDATE_TIME = create("sf_last_update_time");
 
@@ -63,4 +69,7 @@ public final class Keys {
     public static final NamespacedKey ALTAR_QUALITY_SCORE = create("sf_altar_quality_score");
     public static final NamespacedKey ALTAR_CURRENT_INGOT = create("sf_altar_current_ingot");
     public static final NamespacedKey ALTAR_RECIPE_ID = create("sf_altar_recipe_id");
+
+    // IronHeart
+    public static final NamespacedKey BLUEPRINT_TARGET = create("blueprint_target");
 }

@@ -12,6 +12,10 @@ commands:
     usage: /sf <subcommand>
     permission: starryforge.use
     permission-message: You do not have permission to use this command.
+  ih:
+    description: IronHeart command
+    usage: /ih <test>
+    permission: starryforge.admin
 permissions:
   starryforge.use:
     description: Allows use of the main command

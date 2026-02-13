@@ -10,10 +10,7 @@ public enum StarryItemStats {
     SHADOW_DAGGER("SHADOW_DAGGER"),
     FROST_SIGH_BLADE("FROST_SIGH_BLADE");
 
-    private final String itemId;
-
     StarryItemStats(String itemId) {
-        this.itemId = itemId;
     }
 
     public static double getStat(String itemId, int star, NexusStat stat) {

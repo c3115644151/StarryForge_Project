@@ -94,10 +94,6 @@ items:
   HEATED_IRON_INGOT:
     material: PAPER
     model_data: 5016
-  
-  UNFINISHED_SWORD_BLADE:
-    material: PAPER
-    model_data: 5017
 
   ALLOY_FORGE_CORE:
     material: BLAST_FURNACE
@@ -140,6 +136,172 @@ items:
     material: PAPER
     model_data: 6021
     star: false
+
+  ASSEMBLY_TABLE:
+    material: BARREL
+    model_data: 6002
+    star: false
+
+  # Components (10000+)
+  COMPONENT_EDGE:
+    material: IRON_INGOT
+    model_data: 10901
+    star: false
+
+  COMPONENT_SPINE:
+    material: IRON_INGOT
+    model_data: 10902
+    star: false
+
+  COMPONENT_GUARD:
+    material: IRON_INGOT
+    model_data: 10903
+    star: false
+
+  COMPONENT_SHAFT:
+    material: IRON_INGOT
+    model_data: 10904
+    star: false
+
+  COMPONENT_GRIP:
+    material: IRON_INGOT
+    model_data: 10905
+    star: false
+
+  COMPONENT_WEIGHT:
+    material: IRON_INGOT
+    model_data: 10906
+    star: false
+
+  # ==================================================================================
+  # Category: IronHeart Advanced Components (11000+)
+  # ==================================================================================
+  
+  # HEAD
+  STANDARD_IRON_BLADE:
+    material: IRON_INGOT
+    model_data: 11001
+    star: true
+  
+  OBSIDIAN_SHATTER_BLADE:
+    material: OBSIDIAN
+    model_data: 11002
+    star: true
+
+  VOID_CRYSTAL_EDGE:
+    material: AMETHYST_SHARD
+    model_data: 11003
+    star: true
+
+  MECHANICAL_SAW_BLADE:
+    material: IRON_TRAPDOOR
+    model_data: 11004
+    star: true
+
+  # SPINE
+  STANDARD_STEEL_SPINE:
+    material: IRON_BLOCK
+    model_data: 11005
+    star: true
+
+  DRAGONBONE_SPINE:
+    material: BONE
+    model_data: 11006
+    star: true
+
+  DARKSTEEL_SPINE:
+    material: NETHERITE_INGOT
+    model_data: 11007
+    star: true
+
+  QUICKSILVER_SPINE:
+    material: MERCURY_BUCKET
+    model_data: 11008
+    star: true
+
+  # SHAFT
+  OAK_SHAFT:
+    material: STICK
+    model_data: 11009
+    star: true
+
+  REINFORCED_IRON_POLE:
+    material: IRON_BARS
+    model_data: 11010
+    star: true
+
+  SHADOW_FIBER_POLE:
+    material: COAL
+    model_data: 11011
+    star: true
+
+  HYDRAULIC_PISTON_POLE:
+    material: PISTON
+    model_data: 11012
+    star: true
+
+  # GUARD
+  STANDARD_CROSS_GUARD:
+    material: IRON_NUGGET
+    model_data: 11013
+    star: true
+
+  ENERGY_FIELD_EMITTER:
+    material: BEACON
+    model_data: 11014
+    star: true
+
+  SPIKED_KNUCKLE_GUARD:
+    material: IRON_SWORD
+    model_data: 11015
+    star: true
+
+  GRAVITY_DAMPENER:
+    material: ANVIL
+    model_data: 11016
+    star: true
+
+  # GRIP
+  LEATHER_WRAPPED_GRIP:
+    material: LEATHER
+    model_data: 11017
+    star: true
+
+  TACTICAL_RUBBER_GRIP:
+    material: DRIED_KELP
+    model_data: 11018
+    star: true
+
+  MAGNETIC_GLOVE_INTERFACE:
+    material: COMPASS
+    model_data: 11019
+    star: true
+
+  OVERCLOCK_CIRCUIT_GRIP:
+    material: REDSTONE_TORCH
+    model_data: 11020
+    star: true
+
+  # WEIGHT
+  METEORITE_BREAKER:
+    material: ANCIENT_DEBRIS
+    model_data: 11021
+    star: true
+
+  HAWKEYE_LENS:
+    material: GLASS
+    model_data: 11022
+    star: true
+
+  ALCHEMICAL_INJECTOR:
+    material: BREWING_STAND
+    model_data: 11023
+    star: true
+
+  GYROSCOPIC_STABILIZER:
+    material: END_CRYSTAL
+    model_data: 11024
+    star: true
 
   # ==================================================================================
   # Category: Equipment (Weapons/Armor/Artifacts) (7000+)

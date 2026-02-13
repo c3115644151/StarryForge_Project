@@ -1,0 +1,75 @@
+# 铁心锻造蓝图配置 (Blueprints)
+# ==========================================
+
+blueprints:
+  # 大剑 (Greatsword)
+  great_sword:
+    target_item: "hanaweapons:11451"
+    display_name: "大剑蓝图"
+    description:
+      - "<gray>重型双手武器。"
+      - "<gray>需要大量金属来构建宽阔的剑身。"
+    components:
+      COMPONENT_EDGE: 2
+      COMPONENT_SPINE: 1
+      COMPONENT_GRIP: 1
+      COMPONENT_WEIGHT: 1
+
+  # 环印骑士直剑 (Ringed Knight Straight Sword)
+  ringed_knight_sword:
+    target_item: "hanaweapons:11452"
+    display_name: "环印骑士直剑蓝图"
+    components:
+      COMPONENT_EDGE: 1
+      COMPONENT_SPINE: 1
+      COMPONENT_GRIP: 1
+      COMPONENT_GUARD: 1
+
+  # 格挡匕首 (Parrying Dagger)
+  parrying_dagger:
+    target_item: "hanaweapons:11453"
+    display_name: "格挡匕首蓝图"
+    components:
+      COMPONENT_EDGE: 1
+      COMPONENT_GRIP: 1
+      COMPONENT_GUARD: 1
+
+  # 骑士盾 (Knight Shield)
+  knight_shield:
+    target_item: "hanaweapons:11454"
+    display_name: "骑士盾蓝图"
+    components:
+      COMPONENT_GUARD: 2
+      COMPONENT_SPINE: 1
+      COMPONENT_GRIP: 1
+
+  # 长剑 (Longsword)
+  longsword:
+    target_item: "hanaweapons:11455"
+    display_name: "长剑蓝图"
+    components:
+      COMPONENT_EDGE: 1
+      COMPONENT_SPINE: 1
+      COMPONENT_GRIP: 1
+      COMPONENT_WEIGHT: 1
+
+  # 战斧 (Battle Axe)
+  battle_axe:
+    target_item: "hanaweapons:11458"
+    display_name: "战斧蓝图"
+    components:
+      COMPONENT_EDGE: 1
+      COMPONENT_SHAFT: 1
+      COMPONENT_WEIGHT: 2
+      COMPONENT_GRIP: 1
+
+  # 双手巨剑 (Zweihander)
+  zweihander:
+    target_item: "hanaweapons:11459"
+    display_name: "双手巨剑蓝图"
+    components:
+      COMPONENT_EDGE: 3
+      COMPONENT_SPINE: 2
+      COMPONENT_GUARD: 2
+      COMPONENT_GRIP: 1
+      COMPONENT_WEIGHT: 1

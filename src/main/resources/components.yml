@@ -1,0 +1,270 @@
+# IronHeart Components Configuration
+# ==========================================================
+
+# HEAD Components (Provide Integrity, Main Damage Source)
+STANDARD_IRON_BLADE:
+  type: HEAD
+  name: "<gray>制式·精铁刃"
+  item_id: "starryforge:STANDARD_IRON_BLADE"
+  cmd: 11001
+  stats:
+    damage: 8.0
+    speed: 1.0
+    integrity_provider: 4
+    integrity_cost: 0
+  requirements:
+    forge_level: 1
+
+OBSIDIAN_SHATTER_BLADE:
+  type: HEAD
+  name: "<dark_purple>黑曜·碎骨刃"
+  item_id: "starryforge:OBSIDIAN_SHATTER_BLADE"
+  cmd: 11002
+  stats:
+    damage: 14.0
+    speed: 0.85
+    integrity_provider: 3
+    integrity_cost: 0
+  requirements:
+    forge_level: 5
+
+GILDED_FLOW_BLADE:
+  type: HEAD
+  name: "<gold>辉金·流光刃"
+  item_id: "starryforge:GILDED_FLOW_BLADE"
+  cmd: 11003
+  stats:
+    damage: 6.0
+    speed: 1.1
+    integrity_provider: 2
+    integrity_cost: 0
+  requirements:
+    forge_level: 3
+
+FROST_CRYSTAL_BLADE:
+  type: HEAD
+  name: "<aqua>霜泣·晶簇刃"
+  item_id: "starryforge:FROST_CRYSTAL_BLADE"
+  cmd: 11004
+  stats:
+    damage: 7.0
+    speed: 1.0
+    integrity_provider: 5
+    integrity_cost: 0
+  requirements:
+    forge_level: 4
+
+# SPINE Components (Provide Integrity, Structural Support)
+HARDWOOD_SPINE:
+  type: SPINE
+  name: "<yellow>硬木·支撑脊"
+  item_id: "starryforge:HARDWOOD_SPINE"
+  cmd: 11005
+  stats:
+    integrity_provider: 2
+    integrity_cost: 0
+  requirements:
+    forge_level: 1
+
+DRAGONBONE_SPINE:
+  type: SPINE
+  name: "<white>龙骨·韧性脊"
+  item_id: "starryforge:DRAGONBONE_SPINE"
+  cmd: 11006
+  stats:
+    integrity_provider: 4
+    integrity_cost: 0
+  requirements:
+    forge_level: 4
+
+DARKSTEEL_SPINE:
+  type: SPINE
+  name: "<dark_gray>乌钢·重装脊"
+  item_id: "starryforge:DARKSTEEL_SPINE"
+  cmd: 11007
+  stats:
+    speed: -0.1
+    integrity_provider: 6
+    integrity_cost: 0
+  requirements:
+    forge_level: 6
+
+HOLLOW_BLOOD_SPINE:
+  type: SPINE
+  name: "<red>中空·血槽脊"
+  item_id: "starryforge:HOLLOW_BLOOD_SPINE"
+  cmd: 11008
+  stats:
+    integrity_provider: 2
+    integrity_cost: 0
+  requirements:
+    forge_level: 5
+
+# SHAFT Components (Consume Integrity, Reach)
+ASH_WOOD_SHAFT:
+  type: SHAFT
+  name: "<green>白蜡·柔韧杆"
+  item_id: "starryforge:ASH_WOOD_SHAFT"
+  cmd: 11009
+  stats:
+    speed: 0.05
+    integrity_provider: 3
+    integrity_cost: 0
+  requirements:
+    forge_level: 2
+
+CAST_IRON_SHAFT:
+  type: SHAFT
+  name: "<gray>铸铁·处刑官"
+  item_id: "starryforge:CAST_IRON_SHAFT"
+  cmd: 11010
+  stats:
+    reach: 1.0
+    speed: -0.2
+    integrity_provider: 5
+    integrity_cost: 0
+  requirements:
+    forge_level: 4
+
+BAMBOO_SHAFT:
+  type: SHAFT
+  name: "<green>竹节·风行者"
+  item_id: "starryforge:BAMBOO_SHAFT"
+  cmd: 11011
+  stats:
+    speed: 0.15
+    integrity_provider: 2
+    integrity_cost: 0
+  requirements:
+    forge_level: 3
+
+# GUARD Components (Consume Integrity, Protection/Balance)
+STANDARD_CROSSGUARD:
+  type: GUARD
+  name: "<gray>制式·十字格"
+  item_id: "starryforge:STANDARD_CROSSGUARD"
+  cmd: 11012
+  stats:
+    integrity_cost: 1
+  requirements:
+    forge_level: 1
+
+THORN_GUARD:
+  type: GUARD
+  name: "<green>荆棘·反伤锷"
+  item_id: "starryforge:THORN_GUARD"
+  cmd: 11013
+  stats:
+    integrity_cost: 2
+  requirements:
+    forge_level: 3
+
+BULWARK_SHIELD:
+  type: GUARD
+  name: "<dark_gray>壁垒·阔面盾"
+  item_id: "starryforge:BULWARK_SHIELD"
+  cmd: 11014
+  stats:
+    speed: -0.15
+    integrity_cost: 4
+  requirements:
+    forge_level: 5
+
+FEATHERLIGHT_GUARD:
+  type: GUARD
+  name: "<white>羽翼·轻灵格"
+  item_id: "starryforge:FEATHERLIGHT_GUARD"
+  cmd: 11015
+  stats:
+    speed: 0.05
+    integrity_cost: 1
+  requirements:
+    forge_level: 4
+
+# GRIP Components (Consume Integrity, Handle Handling)
+ROUGH_LEATHER_GRIP:
+  type: GRIP
+  name: "<gold>粗革·缠带"
+  item_id: "starryforge:ROUGH_LEATHER_GRIP"
+  cmd: 11016
+  stats:
+    speed: 0.05
+    integrity_cost: 1
+  requirements:
+    forge_level: 1
+
+GEL_GRIP:
+  type: GRIP
+  name: "<green>凝胶·吸附柄"
+  item_id: "starryforge:GEL_GRIP"
+  cmd: 11017
+  stats:
+    speed: -0.05
+    integrity_cost: 2
+  requirements:
+    forge_level: 2
+
+VELVET_GRIP:
+  type: GRIP
+  name: "<light_purple>丝绒·礼仪柄"
+  item_id: "starryforge:VELVET_GRIP"
+  cmd: 11018
+  stats:
+    damage: -0.5
+    integrity_cost: 1
+  requirements:
+    forge_level: 3
+
+NECRO_BONE_GRIP:
+  type: GRIP
+  name: "<dark_red>死灵·骨咒柄"
+  item_id: "starryforge:NECRO_BONE_GRIP"
+  cmd: 11019
+  stats:
+    integrity_cost: 3
+  requirements:
+    forge_level: 6
+
+# WEIGHT Components (Consume Integrity, Balance/Force)
+BRASS_BALANCE_ORB:
+  type: WEIGHT
+  name: "<gold>黄铜·平衡球"
+  item_id: "starryforge:BRASS_BALANCE_ORB"
+  cmd: 11020
+  stats:
+    speed: 0.05
+    damage: -0.2
+    integrity_cost: 1
+  requirements:
+    forge_level: 2
+
+METEORITE_BREAKER:
+  type: WEIGHT
+  name: "<dark_purple>陨铁·破阵锤"
+  item_id: "starryforge:METEORITE_BREAKER"
+  cmd: 11021
+  stats:
+    speed: -0.2
+    integrity_cost: 4
+  requirements:
+    forge_level: 7
+
+HAWKEYE_LENS:
+  type: WEIGHT
+  name: "<aqua>鹰眼·透镜坠"
+  item_id: "starryforge:HAWKEYE_LENS"
+  cmd: 11022
+  stats:
+    integrity_cost: 2
+  requirements:
+    forge_level: 5
+
+GLOW_CHARGE_RING:
+  type: WEIGHT
+  name: "<yellow>辉光·充能环"
+  item_id: "starryforge:GLOW_CHARGE_RING"
+  cmd: 11023
+  stats:
+    integrity_cost: 3
+  requirements:
+    forge_level: 6

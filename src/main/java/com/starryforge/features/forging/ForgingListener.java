@@ -52,28 +52,31 @@ public class ForgingListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getHand() != EquipmentSlot.HAND)
+            return;
 
         Player player = event.getPlayer();
         Action action = event.getAction();
 
         // 1. Left Click Logic (Hit Nodes)
         if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-             ForgingSession session = manager.getSession(player.getUniqueId());
-             if (session != null && session.isForging()) {
-                 session.handleHit(player);
-                 event.setCancelled(true);
-                 return;
-             }
+            ForgingSession session = manager.getSession(player.getUniqueId());
+            if (session != null && session.isForging()) {
+                session.handleHit(player);
+                event.setCancelled(true);
+                return;
+            }
         }
 
         // 2. Right Click Logic (Anvil Interaction)
         if (action == Action.RIGHT_CLICK_BLOCK) {
             Block block = event.getClickedBlock();
-            if (block == null || block.getType() != Material.SMITHING_TABLE) return;
+            if (block == null || block.getType() != Material.SMITHING_TABLE)
+                return;
 
             // Check MultiBlock
-            if (plugin.getMultiBlockManager().checkStructure(block, "astral_altar") == null) return;
+            if (plugin.getMultiBlockManager().checkStructure(block, "astral_altar") == null)
+                return;
 
             event.setCancelled(true);
             Location loc = block.getLocation();
@@ -86,28 +89,30 @@ public class ForgingListener implements Listener {
 
     @EventHandler
     public void onEntityInteract(PlayerInteractAtEntityEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
-        
+        if (event.getHand() != EquipmentSlot.HAND)
+            return;
+
         if (event.getRightClicked() instanceof ItemDisplay || event.getRightClicked() instanceof TextDisplay) {
             // Find the Smithing Table below the display
             Location entityLoc = event.getRightClicked().getLocation();
             Block candidate = entityLoc.getBlock().getRelative(org.bukkit.block.BlockFace.DOWN);
-            
+
             // Check 1 block down (ItemDisplay)
             if (candidate.getType() != Material.SMITHING_TABLE) {
                 // Check 2 blocks down (TextDisplay)
                 candidate = candidate.getRelative(org.bukkit.block.BlockFace.DOWN);
             }
-            
+
             if (candidate.getType() != Material.SMITHING_TABLE) {
                 return;
             }
-            
+
             Location blockLoc = candidate.getLocation();
             ForgingSession session = manager.getOrRestoreSession(blockLoc);
-            
+
             event.setCancelled(true);
-            handleRightClick(event.getPlayer(), blockLoc, event.getPlayer().getInventory().getItemInMainHand(), session);
+            handleRightClick(event.getPlayer(), blockLoc, event.getPlayer().getInventory().getItemInMainHand(),
+                    session);
         }
     }
 
@@ -160,12 +165,8 @@ public class ForgingListener implements Listener {
             // 工程蓝图 → 铺展
             placeWrittenBlueprint(player, loc, session, blueprint);
         } else {
-            // 空白蓝图 → 打开 GUI
-            if (session != null && session.hasBlueprint()) {
-                sendMessage(player, "forging.blueprint.already_placed");
-            } else {
-                plugin.getBlueprintGUI().openFromAltar(player, loc);
-            }
+            // 空白蓝图 → 提示在空气中打开
+            sendMessage(player, "forging.blueprint.use_in_air_hint");
         }
     }
 
@@ -191,11 +192,11 @@ public class ForgingListener implements Listener {
         if (result != null) {
             player.getInventory().addItem(result).values()
                     .forEach(overflow -> player.getWorld().dropItemNaturally(player.getLocation(), overflow));
-            
+
             player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_ITEM_PICKUP, 1.0f, 1.0f);
             sendMessage(player, "forging.process.retrieved"); // Need to ensure lang key exists or use hardcoded for now
         }
-        
+
         manager.endSession(loc);
     }
 
@@ -219,7 +220,8 @@ public class ForgingListener implements Listener {
         long now = System.currentTimeMillis();
         Long lastAttempt = retrieveConfirmTimestamps.get(playerId);
 
-        long RETRIEVE_CONFIRM_TIMEOUT_MS = plugin.getConfigManager().getInt("machines.astral_altar.settings.confirm_timeout_ms", 5000);
+        long RETRIEVE_CONFIRM_TIMEOUT_MS = plugin.getConfigManager()
+                .getInt("machines.astral_altar.settings.confirm_timeout_ms", 5000);
 
         if (lastAttempt != null && (now - lastAttempt) < RETRIEVE_CONFIRM_TIMEOUT_MS) {
             // 确认窗口内，执行取出
@@ -278,7 +280,7 @@ public class ForgingListener implements Listener {
     }
 
     private void handleMaterialPlacement(Player player, ForgingSession session, ItemStack item,
-                                         ForgingRecipeManager.ForgingRecipe recipe) {
+            ForgingRecipeManager.ForgingRecipe recipe) {
         double temp = PDCManager.getTemperature(item);
         if (temp < recipe.getMinTemperature()) {
             String msg = plugin.getConfigManager().getMessage("forging.material.temp_low")

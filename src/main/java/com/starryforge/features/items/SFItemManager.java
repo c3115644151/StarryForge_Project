@@ -69,7 +69,8 @@ public class SFItemManager {
                             currentItems.set(key, defItems.getConfigurationSection(key));
                             changed = true;
                         } else {
-                            // Check for missing fields in existing item (e.g. model_data, display_name, star)
+                            // Check for missing fields in existing item (e.g. model_data, display_name,
+                            // star)
                             ConfigurationSection defItemSection = defItems.getConfigurationSection(key);
                             ConfigurationSection currItemSection = currentItems.getConfigurationSection(key);
                             for (String field : defItemSection.getKeys(false)) {
@@ -97,7 +98,20 @@ public class SFItemManager {
             return;
         }
 
+        // Add Assembly Table Registration (Manual Override)
+        // This handles the custom block item for the Assembler
+        if (itemsSection.contains("assembly_table")) {
+            // Register as BARREL to avoid vanilla Smithing Table conflict
+            registerItem("assembly_table", Material.BARREL, mm.deserialize("<gradient:#FFD700:#FFA500>组装台</gradient>"),
+                    0, false,
+                    List.of(mm.deserialize("<gray>用于将标准组件组装成武器的基础设施。"),
+                            mm.deserialize("<gray>需要配合 <white>蓝图</white> 使用。")));
+        }
+
         for (String key : itemsSection.getKeys(false)) {
+            if (key.equalsIgnoreCase("assembly_table"))
+                continue; // Already handled manually above
+
             ConfigurationSection section = itemsSection.getConfigurationSection(key);
             if (section == null)
                 continue;
@@ -113,11 +127,18 @@ public class SFItemManager {
             if ("SLUICE_MACHINE".equals(key)) {
                 langKeyBase = "items.sluice_machine.base";
             }
+            // Assembly Table Mapping
+            if ("assembly_table".equals(key)) {
+                langKeyBase = "items.assembly_table";
+            }
 
             String nameKey = langKeyBase + ".name";
             String name = plugin.getConfigManager().getMessage(nameKey);
 
             if (name == null || name.startsWith("<red>Missing message:")) {
+                // Log missing key for debugging
+                plugin.getLogger().warning("[SFItemManager] Missing name for " + key + " (tried " + nameKey + ")");
+
                 // Try 'display_name' first (legacy/manual override)
                 name = section.getString("display_name");
                 if (name == null) {
@@ -136,47 +157,55 @@ public class SFItemManager {
 
             ItemStack item = new ItemStack(material);
 
-            // Special handling for Greatsword: Apply 1.21 Data Components for native blocking
-            // We MUST construct the full item NBT (including Name, Lore, PDC) and apply it via modifyItemStack
-            // because standard setItemMeta() might strip unknown Data Components like 'consumable' or 'blocks_attacks'.
+            // Special handling for Greatsword: Apply 1.21 Data Components for native
+            // blocking
+            // We MUST construct the full item NBT (including Name, Lore, PDC) and apply it
+            // via modifyItemStack
+            // because standard setItemMeta() might strip unknown Data Components like
+            // 'consumable' or 'blocks_attacks'.
             if ("greatsword".equalsIgnoreCase(key)) {
                 try {
                     // We use custom_data (PublicBukkitValues) to store PDC keys manually.
                     // Dynamically get the key from Keys class to ensure match with PDCManager
                     String itemIdKey = Keys.ITEM_ID_KEY.toString(); // e.g. "nexus:item_id" or "starryforge:sf_item_id"
-                    
+
                     // PublicBukkitValues expects "namespace:key": "value"
                     // We also include legacy keys just in case
-                    String customData = "{PublicBukkitValues:{\"" + itemIdKey + "\":\"greatsword\", \"starryforge:item_id\":\"greatsword\"}}";
+                    String customData = "{PublicBukkitValues:{\"" + itemIdKey
+                            + "\":\"greatsword\", \"starryforge:item_id\":\"greatsword\"}}";
 
                     StringBuilder sb = new StringBuilder();
                     sb.append(material.getKey().toString()); // minecraft:iron_sword
                     sb.append("[");
                     sb.append("blocks_attacks={damage_reductions:[{base:0,factor:0.5}]},");
-                    sb.append("consumable={consume_seconds:72000, animation:'block', has_consume_particles:false, can_always_use:true},");
-                    
+                    sb.append(
+                            "consumable={consume_seconds:72000, animation:'block', has_consume_particles:false, can_always_use:true},");
+
                     // Note: We DO NOT set custom_model_data here manually.
-                    // ItemMeta.setCustomModelData() handles it correctly and safely across versions.
-                    
+                    // ItemMeta.setCustomModelData() handles it correctly and safely across
+                    // versions.
+
                     // Note: We DO NOT set custom_name or lore here.
-                    // We let the standard setItemMeta logic handle it below to ensure correct formatting (MiniMessage)
+                    // We let the standard setItemMeta logic handle it below to ensure correct
+                    // formatting (MiniMessage)
                     // and to avoid JSON escaping issues in the NBT string.
-                    // We assume setItemMeta will preserve the 'blocks_attacks' and 'consumable' components.
-                    
+                    // We assume setItemMeta will preserve the 'blocks_attacks' and 'consumable'
+                    // components.
+
                     sb.append("custom_data=").append(customData);
                     sb.append("]");
-                    
+
                     String itemDef = sb.toString();
                     // LogUtil.debug("Constructing Greatsword with NBT: " + itemDef);
-                    
+
                     // 4. Generate Item
                     @SuppressWarnings("deprecation")
                     ItemStack tempItem = org.bukkit.Bukkit.getUnsafe().modifyItemStack(item, itemDef);
                     item = tempItem;
-                    
+
                     // 5. Allow fall-through to standard processing (Meta, PDC, Attributes)
                     // This ensures Name/Lore are set correctly.
-                    
+
                 } catch (Throwable t) {
                     plugin.getLogger().warning("Failed to apply Data Components to Greatsword: " + t.getMessage());
                     t.printStackTrace();
@@ -184,7 +213,8 @@ public class SFItemManager {
                 }
             }
 
-            // Frostsigh Blade / Oblivion: Add consumable component for "Hold to Charge" (Iaido Stance)
+            // Frostsigh Blade / Oblivion: Add consumable component for "Hold to Charge"
+            // (Iaido Stance)
             // Removed from here to prevent overwrite by setItemMeta
 
             // 1. Frostsigh Blade / Oblivion: Inject consumable component FIRST
@@ -192,21 +222,23 @@ public class SFItemManager {
             if ("frost_sigh_blade".equalsIgnoreCase(key) || "frostsigh_oblivion".equalsIgnoreCase(key)) {
                 try {
                     String itemIdKey = Keys.ITEM_ID_KEY.toString();
-                    String customData = "{PublicBukkitValues:{\"" + itemIdKey + "\":\"" + key + "\", \"starryforge:sf_item_id\":\"" + key + "\"}}";
+                    String customData = "{PublicBukkitValues:{\"" + itemIdKey + "\":\"" + key
+                            + "\", \"starryforge:sf_item_id\":\"" + key + "\"}}";
 
                     StringBuilder sb = new StringBuilder();
                     sb.append(material.getKey().toString());
                     sb.append("[");
                     // Use 'bow' animation for Charging Stance
-                    sb.append("consumable={consume_seconds:72000, animation:'bow', has_consume_particles:false, can_always_use:true},");
-                    
+                    sb.append(
+                            "consumable={consume_seconds:72000, animation:'bow', has_consume_particles:false, can_always_use:true},");
+
                     sb.append("custom_data=").append(customData);
                     sb.append("]");
-                    
+
                     @SuppressWarnings("deprecation")
                     ItemStack tempItem = org.bukkit.Bukkit.getUnsafe().modifyItemStack(item, sb.toString());
                     item = tempItem;
-                    
+
                 } catch (Throwable t) {
                     plugin.getLogger().warning("Failed to apply Data Components to Frostsigh: " + t.getMessage());
                 }
@@ -236,11 +268,12 @@ public class SFItemManager {
                     // Set flag for legacy support
                     org.bukkit.NamespacedKey starKey = new org.bukkit.NamespacedKey(plugin, "nexus_has_star");
                     meta.getPersistentDataContainer().set(starKey, PersistentDataType.INTEGER, 1);
-                    
+
                     // Set NexusCore Standard Rating (Default to config value or 1)
-                    meta.getPersistentDataContainer().set(NexusKeys.STAR_RATING, PersistentDataType.INTEGER, defaultStar);
+                    meta.getPersistentDataContainer().set(NexusKeys.STAR_RATING, PersistentDataType.INTEGER,
+                            defaultStar);
                 }
-                
+
                 // Add optimization flag for FrostsighListener
                 if ("frost_sigh_blade".equalsIgnoreCase(key) || "frostsigh_oblivion".equalsIgnoreCase(key)) {
                     org.bukkit.NamespacedKey flagKey = new org.bukkit.NamespacedKey(plugin, "sf_consumable_injected");
@@ -254,7 +287,7 @@ public class SFItemManager {
                 meta.lore(lore);
 
                 item.setItemMeta(meta);
-                
+
                 // Apply NexusCore RPG Attributes
             }
             customItems.put(key, item);
@@ -275,7 +308,7 @@ public class SFItemManager {
     private void registerSluiceVariants() {
         for (int i = 1; i <= 3; i++) {
             String key = "SLUICE_MACHINE_" + toRoman(i);
-            
+
             // Force overwrite to ensure correct lang keys are used
             ItemStack item = new ItemStack(Material.BARREL);
             ItemMeta meta = item.getItemMeta();
@@ -350,6 +383,54 @@ public class SFItemManager {
 
         // Equipment Embryo
         registerManualItem("EQUIPMENT_EMBRYO", Material.CLAY_BALL, 4004, "items.equipment_embryo");
+
+        // ==========================================
+        // IronHeart Smithing Items
+        // ==========================================
+
+        // Assembly Table
+        // Use lowercase ID to match AssemblerGUI check and ensure fallback consistency
+        registerManualItem("assembly_table", Material.BARREL, 6002, "items.assembly_table");
+
+        // Components
+        registerManualItem("COMPONENT_EDGE", Material.IRON_INGOT, 10001, "items.component_edge");
+        registerManualItem("COMPONENT_SPINE", Material.IRON_INGOT, 10002, "items.component_spine");
+        registerManualItem("COMPONENT_GUARD", Material.IRON_INGOT, 10003, "items.component_guard");
+        registerManualItem("COMPONENT_SHAFT", Material.IRON_INGOT, 10004, "items.component_shaft");
+        registerManualItem("COMPONENT_GRIP", Material.IRON_INGOT, 10005, "items.component_grip");
+        registerManualItem("COMPONENT_WEIGHT", Material.IRON_INGOT, 10006, "items.component_weight");
+    }
+
+    private void registerItem(String id, Material material, Component name, int modelData, boolean glow,
+            List<Component> lore) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.displayName(name);
+            if (modelData > 0)
+                meta.setCustomModelData(modelData);
+            if (lore != null)
+                meta.lore(lore);
+
+            // Set ID in PDC
+            PDCManager.setString(item, Keys.ITEM_ID_KEY, id);
+            meta.getPersistentDataContainer().set(Keys.ITEM_ID_KEY, PersistentDataType.STRING, id);
+            meta.getPersistentDataContainer().set(NexusKeys.ITEM_ID, PersistentDataType.STRING, id);
+
+            if (glow) {
+                // Simple glow effect using Unbreaking I + Hide Enchants
+                @SuppressWarnings("deprecation")
+                org.bukkit.enchantments.Enchantment glowEnchant = org.bukkit.Registry.ENCHANTMENT
+                        .get(org.bukkit.NamespacedKey.minecraft("unbreaking"));
+                if (glowEnchant != null) {
+                    meta.addEnchant(glowEnchant, 1, true);
+                }
+                meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+            }
+
+            item.setItemMeta(meta);
+        }
+        customItems.put(id, item);
     }
 
     private void applyHammerTier(ItemStack item, int tier) {
@@ -398,7 +479,7 @@ public class SFItemManager {
 
     private void registerEnchantedBook() {
         String key = "ENCHANTED_BOOK_LITHIC_INSIGHT";
-        
+
         // Always recreate to ensure lang updates
         ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
         ItemMeta bookMeta = book.getItemMeta();
@@ -434,8 +515,56 @@ public class SFItemManager {
                 }
             } catch (Exception e) {
                 // Ignore errors during get (e.g. if NexusCore not ready)
-                plugin.getLogger().warning("[SFItemManager] Failed to update attributes for " + key + ": " + e.getMessage());
+                plugin.getLogger()
+                        .warning("[SFItemManager] Failed to update attributes for " + key + ": " + e.getMessage());
             }
+
+            // 4. Generate Lore for Blueprints
+            if (key.equals("WRITTEN_BLUEPRINT") && item.hasItemMeta()) {
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    String blueprintId = com.starryforge.features.core.PDCManager.getString(item,
+                            com.starryforge.utils.Keys.BLUEPRINT_TARGET);
+                    if (blueprintId != null) {
+                        com.starryforge.features.ironheart.config.BlueprintConfig.Blueprint bp = plugin
+                                .getIronHeartManager().getBlueprintConfig().getBlueprint(blueprintId);
+                        if (bp != null) {
+                            plugin.getLogger().info("[Debug] Generating lore for blueprint: " + blueprintId);
+                            java.util.List<net.kyori.adventure.text.Component> existingLore = meta.lore();
+                            java.util.List<net.kyori.adventure.text.Component> lore = existingLore != null
+                                    ? existingLore
+                                    : new java.util.ArrayList<>();
+
+                            lore.add(net.kyori.adventure.text.Component.empty());
+
+                            String header = plugin.getConfigManager()
+                                    .getMessage("forging.gui.blueprint_lore_components_header");
+                            if (!header.contains("Missing")) {
+                                lore.add(mm.deserialize(header));
+                            }
+
+                            bp.requiredComponents().forEach((type, count) -> {
+                                String typeKey = "component_types." + type.name().toLowerCase();
+                                String typeName = plugin.getConfigManager().getMessage(typeKey);
+                                if (typeName.contains("Missing"))
+                                    typeName = type.name();
+
+                                String format = plugin.getConfigManager()
+                                        .getMessage("forging.gui.blueprint_lore_component_format");
+                                if (format.contains("Missing"))
+                                    format = "<dark_gray>- <white>{amount}x {component}";
+
+                                lore.add(mm.deserialize(format
+                                        .replace("{amount}", String.valueOf(count))
+                                        .replace("{component}", typeName)));
+                            });
+                            meta.lore(lore);
+                            item.setItemMeta(meta);
+                        }
+                    }
+                }
+            }
+
             return item;
         }
         return null;
@@ -449,13 +578,14 @@ public class SFItemManager {
         List<ItemStack> items = new ArrayList<>();
         for (ItemStack item : customItems.values()) {
             ItemStack clone = item.clone();
-             // Ensure attributes are up-to-date
+            // Ensure attributes are up-to-date
             try {
                 if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("NexusCore")) {
                     com.nexuscore.NexusCore.getInstance().getRpgManager().updateItemAttributes(clone);
                 }
             } catch (Exception e) {
-                plugin.getLogger().warning("[SFItemManager] Failed to update attributes in getAllItems: " + e.getMessage());
+                plugin.getLogger()
+                        .warning("[SFItemManager] Failed to update attributes in getAllItems: " + e.getMessage());
             }
             items.add(clone);
         }

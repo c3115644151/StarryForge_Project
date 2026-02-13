@@ -78,10 +78,16 @@ public class ConfigManager {
         }
 
         if (langFile.exists()) {
-            langConfig = YamlConfiguration.loadConfiguration(langFile);
-            LogUtil.debug("Loaded language file: " + locale);
+            langConfig = new YamlConfiguration();
+            try {
+                langConfig.load(langFile);
+                LogUtil.debug("Loaded language file: " + locale + ". Total keys: " + langConfig.getKeys(true).size());
+            } catch (Exception e) {
+                plugin.getLogger().severe("Failed to load language file " + langFile.getPath() + ": " + e.getMessage());
+                e.printStackTrace();
+            }
         } else {
-            plugin.getLogger().severe("Could not load language file: " + langFile.getPath());
+            plugin.getLogger().severe("Could not find language file: " + langFile.getPath());
             langConfig = new YamlConfiguration();
         }
 

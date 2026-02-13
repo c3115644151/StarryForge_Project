@@ -1,215 +1,115 @@
-# StarryForge (神匠工坊) 设计文档
+# 星野体系：铁心锻造 (IronHeart) 架构设计文档
+**(IronHeart Architecture Design Document)**
 
-## 0. 前置玩法：矿脉与鉴定 (Mining & Identification)
-这是衔接普通生存与神匠锻造的桥梁，旨在赋予“挖矿”这一行为更深的策略性和理由。
-
-### 0.1 核心理念
-*   **未知与期待**：挖矿不再直接获得矿物，而是获得【未知矿簇】。你永远不知道这一铲子下去是废石还是传世宝玉。
-*   **勘探与定位**：通过【矿脉丰度】系统，让玩家从“漫无目的的鱼骨挖掘”转向“寻找核心矿脉的定点开采”。
-
-### 0.2 矿脉分布 (Vein Distribution)
-为了解决 Terra 地形生成固定的问题，我们采用 **“隐性噪声场 (Implicit Noise Field)”** 来定义核心矿脉，无需修改世界生成器。
-
-*   **丰度决定因素**：
-    1.  **群系加成 (Biome Factor)**: 
-        *   继承 `BiomeGifts` 的设定（富集区/普通区/贫瘠区）。
-        *   *决定保底*：富集区即使运气差，也不会出太烂的矿。
-    2.  **深度加成 (Depth Factor)**:
-        *   越深（接近 Bedrock），高星概率越高。
-    3.  **核心矿脉 (Core Veins) - 关键机制**:
-        *   *原理*：基于 `WorldSeed` + `Coordinates` 计算出的 3D 柏林噪声 (Perlin Noise) 数值场。
-        *   *判定*：当 `噪声值 > 0.8` 且 `当前群系 == 富集区` 时，该区域被判定为 **【核心矿脉】**。
-        *   *表现*：这些区域在视觉上与普通矿洞无异，但掉落的矿簇拥有极高的 `潜在品质 (Potential)`。
-*   **勘探工具 - 地质谐振仪 (Seismic Resonator)**：
-    *   右键地面/墙壁，根据当前区块的“噪声值”反馈不同的音效或粒子波。
-    *   **玩法循环**：带着仪器跑图 -> 听到高频共鸣 -> 确定核心矿脉位置 -> 定点深挖。
-
-### 0.3 鉴定系统 (Identification)
-*   **获取方式**：
-    *   **非必然掉落**：只有使用**特殊工具**（如注灵镐/勘探镐）或拥有**特定附魔**时，挖掘**任何岩石或矿物**才有机率掉落【未知矿簇】。
-    *   **全局掉落**：无论挖石头还是挖原矿，都有机会产出矿簇。
-    *   **丰度关联**：掉落的矿簇内部隐藏了基于当前区域（普通/富集/核心）的品质潜力。
-*   **洗矿台 (Sluice Box)**：
-    *   **机制**：无需 QTE，全自动或简单的右键交互。
-    *   **产出逻辑**：
-        *   矿簇可洗出几乎所有类型的矿物（原版矿+特产矿）。
-        *   **星级传导**：矿簇的潜在品质越高 -> 洗出高星级矿物的概率越高 + 洗出稀有特产矿的概率越高。
-    *   **增幅**：添加【炼金溶剂】可进一步提升高星级/稀有矿物的产出率。
+**版本**：2.0
+**状态**：[规划中]
+**模块**：`features.ironheart`
 
 ---
 
-## 1. 项目概述 (Overview)
-**神匠工坊 (StarryForge)** 是一个旨在为服务器引入深度锻造玩法的插件。其核心理念是让每一件顶级装备都成为玩家的“传家宝”，通过高成本、高风险、高回报的仪式感，赋予物品独特的情感价值。
+## 1. 架构总览 (Architectural Overview)
 
-**核心流程**：
-`矿物熔炼 (Alloy Smelting)` -> `重锤锻打 (Heavy Forging)` -> `注灵附魔 (Soul Socketing)`
+本模块旨在构建一个**深度定制化、数据驱动**的武器组装系统。核心思想是摒弃原版静态物品 ID，转为基于 **NBT (PDC)** 的动态组件容器。
 
----
-
-## 2. 核心机制 (Core Mechanics)
-
-### 2.1 矿物熔炼 (Alloy Smelting) - 热力冲程 (Thermal Stroke)
-玩家需要搭建 **合金高炉 (Alloy Furnace)**，通过独特的物理交互 QTE 将矿物熔炼为精炼合金。
-
-*   **核心理念**: **减法机制**。
-    *   **上限决定**: 成品星级上限完全取决于 **原材料的平均星级**。
-    *   **操作决定**: QTE 操作决定完成度。完美操作可保留 100% 潜能，失误或炸炉将导致成品降星。
-    *   **公式**: `最终星级 = floor(原材料平均星级 * (0.5 + 0.5 * QTE完成率))` (例: 5星材料 + 50%渣操作 = 3.75 -> 3星)。
-
-*   **设备**: 合金高炉（3x3x3 多方块结构）。
-*   **交互流程**:
-    1.  **投料 (Setup)**: 右键打开 GUI，放入 **矿物** (Base/Specialty) 与 **助熔剂** (Flux)。点击【点火】，GUI 关闭，进入世界交互模式。
-    2.  **升温冲程 (Heat-Up)**:
-        *   **视觉**: ActionBar 显示温度计 `[❄️ ---|==★==|--- 🔥]`。`|==★==|` 为甜蜜点，`█` 为当前温度。
-        *   **动态**: 温度指针会自动游走。
-    3.  **动态博弈 (The Game)**:
-        *   **鼓风 (右键)**: 对结构右键，温度指针向右(热)加速。
-        *   **阻尼 (潜行)**: 按住 `Shift`，增大指针阻力，使其稳定或减速。
-        *   **锻打 (左键)**: 当指针位于 **甜蜜点** 时，左键敲击炉体。
-            *   *成功*: 进度 +1，积累完美评分。
-            *   *失败*: 进度不变，扣除评分。
-    4.  **助熔剂策略 (Flux)**:
-        *   **煤炭**: 标准手感。
-        *   **烈焰粉**: 升温快，甜蜜点宽（适合快节奏）。
-        *   **粘液球**: 惯性大，甜蜜点稳（适合精准控制）。
-*   **风险 (Meltdown)**:
-    *   若温度冲入 **红色死亡区** 超过 3秒，触发 **炸炉**。
-    *   **后果**: 结构受损（方块掉落），原材料销毁。
-    *   **急救**: 投掷 **水瓶/雪球** 可强制降温，但直接结算为 **最低评价** (成品变为 1星)。
-
-### 2.2 温度系统 (Thermodynamics)
-精炼锭具有物理温度属性，直接影响锻造流程。
-
-*   **红热状态 (Red-Hot)**：
-    *   刚出炉或重新加热后的状态。
-    *   **必要性**：只有此状态下的锭才能在重型铁砧上进行锻打。
-    *   **副作用**：在背包中会对玩家造成持续灼烧伤害（真实感机制）。
-*   **自然冷却**：
-    *   放置在地面、容器中或手持一段时间后，温度会自然衰减。
-*   **快速冷却**：
-    *   丢入水中 -> 瞬间变为【常温锭】。
-*   **重新加热**：
-    *   将【常温锭】放入原版高炉 (Blast Furnace) 烧制 -> 恢复为【红热的精炼锭】（适宜锻造温度）。
-
-### 2.3 重锤锻打 (Heavy Forging)
-这是打造装备核心部件的步骤，强调“一锭一锻”的仪式感。
-
-*   **设备**：
-    *   **重型铁砧 (Heavy Anvil)**：核心工作台。
-    *   **锻造锤 (Forging Hammer)**：必备工具。
-    *   **泰坦重锤 (Titan's Hammer)**：高级工具，用于处理顶级合金。
-### 2.3 重锤锻打 (Heavy Forging) - 韵律打击 (Rhythmic Strike)
-这是打造装备核心部件的步骤，强调“一锭一锻”的仪式感与“人锤合一”的节奏感。
-
-*   **设备**：
-    *   **重型铁砧 (Heavy Anvil)**：包含底座（黑曜石/下界合金块）与砧面（特殊方块）的多方块结构。
-    *   **锻造锤 (Forging Hammer)**：
-        *   *手感差异*：不同材质的锤子拥有不同的 **判定窗口 (Tolerance)** 和 **敲击力度 (Impact)**。
-*   **流程**：
-    1.  **蓝图铺设**：在铁砧上右键打开 GUI，放入【空白蓝图】并选择目标产物（如“星陨板甲”）。铁砧台面会浮现出半透明的目标幻影（ItemDisplay）。
-    2.  **分步锻造 (The Cycle)**：
-        *   例如星陨板甲需要 8 个锭，则需进行 8 次独立的 **"加热-锻打-融合"** 循环。
-        *   界面/全息字显示进度：`Phase 1/8`。
-    3.  **单次循环交互**：
-        *   **放置**：右手持有【红热的精炼锭】右键铁砧，锭被放置在砧面上。
-        *   **韵律 QTE (Rhythmic QTE)**：
-            *   *视觉*：一个 **粒子光环** 从外围向中心收缩。
-            *   *操作*：当光环与中心的 **判定点** 重合变色（如变金/变绿）时，玩家需挥动锤子（左键）敲击。
-            *   *节奏*：敲击频率不固定，模拟真实的“叮——当，叮——当”的重轻交替节奏。
-        *   **反馈机制**：
-            *   **Perfect**: 高频清脆音效 + 爆裂金星粒子 + 进度大幅增加。
-            *   **Good**: 普通撞击音效 + 少量火花 + 进度正常增加。
-            *   **Miss/Too Cold**: 闷响 (Thud) + 灰色烟雾 + 进度条不涨甚至扣除耐久 -> 导致【冷裂】风险。
-    4.  **材料特性 (Material Personality)**：
-        *   **硬度 (Hardness)**：决定光环收缩的速度（星陨钢极快，青铜较慢）。
-        *   **脆性 (Brittleness)**：决定判定窗口的宽度（越脆越难敲）。
-    5.  **最终成型**：
-        *   完成 8 个阶段后，台面上的物品模型“坍缩”为【装备原胚】 (Equipment Embryo)。
-        *   **品质继承**：`原胚星级 = (精炼物平均星级 * 40%) + (锻打精确度评分 * 60%)`。
-            *   *设计师批注*：这里提高了操作评分的权重，强调“神匠”的技术价值大于单纯的堆料。
-
-### 2.4 注灵附魔 (Soul Socketing)
-为装备赋予灵魂和特殊词条。
-
-*   **设备**：注灵台 (Soul Table)。
-*   **机制**：在原胚的插槽中放入特定的触媒材料。
-*   **产物**：拥有 Lore、特效和特殊属性的成品装备（如《星陨钢剑·雷噬》）。
+### 核心设计原则
+1.  **功能优先 (Feature-First)**：所有相关代码（GUI, Logic, Listeners）均收敛于 `features/ironheart` 包下，严禁按层分包。
+2.  **数据驱动 (Data-Driven)**：武器属性由组件 NBT 实时计算，而非查表。
+3.  **防御性编程**：严格校验 NBT 完整性，处理版本兼容与空指针异常。
+4.  **静态交互**：GUI 逻辑必须保持简洁，无 QTE，强调策略性。
 
 ---
 
-## 3. 材料体系 (Materials & Mapping)
+## 2. 模块结构设计 (Module Structure)
 
-基于 `BiomeGifts` 的特产矿物，对应生成的精炼合金如下：
-
-| 基础特产 (Biome Gift) | 对应精炼物 (Refined Alloy) | 英文 ID (Refined) | 分类 | 用途示例 |
-| :--- | :--- | :--- | :--- | :--- |
-| **褐煤 (Lignite)** | **压缩碳晶** | `COMPRESSED_CARBON` | 功能材 | 泰坦重锤 (T2工具) |
-| **富铁 (Rich Slag)** | **星陨钢锭** | `STAR_STEEL` | 结构材 | 星陨重装 (物理坦克) |
-| **砂金 (Gold Dust)** | **皇金铸锭** | `ROYAL_BULLION` | 触媒材 | 君王权冠 (交易/Buff) |
-| **充能尘埃 (Charged Dust)**| **永动通量环** | `FLUX_RING` | 触媒材 | 过载指环 (挖掘/移速) |
-| **永冻冰晶 (Ice Shard)** | **极寒霜心** | `FROSTHEART` | 结构材 | 霜叹系列 (减速/控制) |
-| **洋流精粹 (Tide Essence)**| **深渊秘银锭** | `ABYSSAL_MITHRIL` | 结构材 | 潮汐行者 (水下加成) |
-| **孔雀石晶体 (Copper)** | **青铜合金板** | `MALACHITE_ALLOY` | 功能材 | 青铜壁垒 (强化盾牌) |
-| **高山翠玉 (Jade Shard)** | **帝王玉佩** | `IMPERIAL_JADE` | 触媒材 | 平安扣 (保命/回复) |
-| **灵魂玻片 (Soul Shard)** | **幽魂复合板** | `GHOST_PANE` | 功能材 | 幽影匕首 (背刺暴击) |
-| **火神之鳞 (Vulcan Scale)**| **神锻合金块** | `VULCAN_ALLOY` | 结构材 | 狱火神兵 (火焰/反伤) |
-| **共鸣晶簇 (Echo Shard)** | *(待定)* | `VOID_ECHO` | 触媒材 | *(待设计)* |
-
----
-
-## 4. 技术架构 (Technical Architecture)
-
-### 4.1 数据存储 (PersistentDataContainer)
-所有物品状态均通过 PDC 存储，确保跨插件兼容和数据持久化。
-
-*   **Namespace**: `starryforge`
-*   **Keys**:
-    *   `temperature` (FLOAT): 当前温度值。
-    *   `max_temperature` (FLOAT): 材质熔点/最佳锻造温度。
-    *   `forging_progress` (INTEGER): 当前锻造阶段（如 3 代表 3/8）。
-    *   `quality_score` (DOUBLE): 累计 QTE 评分。
-    *   `blueprint_type` (STRING): 正在锻造的目标物品 ID。
-
-### 4.2 视觉表现 (Visuals)
-*   **QTE 界面**：
-    *   放弃文本提示，全面启用 **World-Space UI**。
-    *   使用 `BlockDisplay` 或 `TextDisplay` 在铁砧表面投影出 **收缩光环** 和 **命中判定区**。
-    *   进度通过铁砧侧面的 **全息进度条** 显示。
-*   **物理表现**：
-    *   **变形 (Morphing)**：利用 `ItemDisplay` 的 `Transformation` 插值，在敲击过程中让模型产生“压扁”、“延展”的视觉位移。
-    *   **温度辉光**：根据 PDC 中的 `temperature` 值，动态调整物品模型的发光颜色（BlockLight 也就是 `Glowing` 效果颜色，或者通过 `dust` 粒子包裹）。
-
-### 4.3 交互逻辑
-*   **InventoryTick**: 检查玩家背包中是否有高温物品，触发燃烧伤害。
-*   **PlayerInteract**: 处理铁砧、高炉的右键交互。
-*   **BlockPlace**: 阻止直接放置处于“锻造中”状态的物品（可选）。
+```
+com.starryforge.features.ironheart
+├── IronHeartManager.java       # 模块入口，负责生命周期管理
+├── config
+│   ├── ComponentConfig.java    # 加载 components.yml
+│   ├── BlueprintConfig.java    # 加载 blueprints.yml
+│   └── ResonanceConfig.java    # 加载 resonance.yml (隐秘契约)
+├── data
+│   ├── model
+│   │   ├── IronHeartWeapon.java # 武器实体包装类 (Wrapper)
+│   │   ├── WeaponComponent.java # 组件数据对象
+│   │   └── VeteranStats.java    # 历战数据记录
+│   └── PDCAdapter.java         # NBT 读写适配器 (JSON <-> PDC)
+├── gui
+│   ├── AssemblerGUI.java       # 组装台主界面 (54格)
+│   ├── BlueprintSelector.java  # 蓝图选择界面 (配方书)
+│   └── GUIStateSession.java    # 玩家会话状态机
+├── logic
+│   ├── StatCalculator.java     # 属性计算器 (含共鸣逻辑)
+│   ├── IntegrityValidator.java # 构造值校验器
+│   ├── ModificationLogic.java  # 改装/损耗/回收判定
+│   └── ScrapRecycler.java      # 废料回收逻辑
+└── listeners
+    ├── CombatListener.java     # 伤害计算与历战数据更新
+    └── AssemblerListener.java  # 方块交互监听
+```
 
 ---
 
-## 5. 开发计划 (Roadmap)
+## 3. 数据流架构 (Data Flow Architecture)
 
-1.  **Phase 1: 核心矿脉与鉴定系统 (Mining & Identification)**
-    *   **NoiseManager**: 实现基于 Perlin Noise 的核心矿脉判定算法。
-    *   **矿簇系统**: 定义【未知矿簇】物品与全局掉落监听器 (GlobalDropListener)。
-    *   **勘探工具**: 实现【地质谐振仪】的探测逻辑与反馈效果。
-    *   **洗矿系统**: 实现【洗矿台】的交互逻辑与掉落表 (LootTable)。
+### 3.1 武器生成流程 (Creation)
+1.  **Input**: 玩家选择 `Blueprint` + 放入 `Component Items`。
+2.  **Process**:
+    *   `IntegrityValidator` 校验构造值合法性。
+    *   `StatCalculator` 遍历组件计算基础属性。
+    *   `ResonanceConfig` 检查特殊组合并应用加成。
+3.  **Output**: 生成 `ItemStack`，写入 `starfield:forge_data` (JSON)。
 
-2.  **Phase 2: 基础架构与温度系统 (Infrastructure & Thermodynamics)**
-    *   **PDCManager**: 统一管理所有自定义物品的数据存储（温度、品质、阶段）。
-    *   **SFItemManager**: 定义所有精炼物、中间产物、成品装备的物品堆叠。
-    *   **温度控制**: 实现物品在不同环境下的升温、降温、灼烧玩家逻辑。
+### 3.2 战斗结算流程 (Combat)
+1.  **Event**: `EntityDamageByEntityEvent`
+2.  **Read**: `PDCAdapter` 读取攻击者手持物品的 `stats_cache`。
+3.  **Apply**: 直接应用 `damage` 数值。
+4.  **Update**: 异步更新 `veteran` 数据 (累积伤害)。
 
-3.  **Phase 3: 合金锻炉 (Alloy Smelting)**
-    *   多方块结构识别与构建。
-    *   熔炼核心逻辑：输入检测 -> 温度控制 QTE -> 产出计算。
-    *   炸炉与废渣回收机制。
+---
 
-4.  **Phase 4: 重锤锻打 (Heavy Forging)**
-    *   重型铁砧交互与蓝图系统。
-    *   “一锭一锻”的多阶段循环逻辑。
-    *   敲击 QTE 小游戏实现。
+## 4. 分阶段开发规划 (Development Roadmap)
 
-5.  **Phase 5: 注灵与成品 (Socketing & Finalization)**
-    *   注灵台 GUI 与镶嵌逻辑。
-    *   动态属性生成（AttributeModifiers）与 Lore 组装。
-    *   成品特效与特殊技能实现。
+为确保代码质量与可维护性，开发将分为 5 个阶段进行，每个阶段必须经过测试验证后方可进入下一阶段。
+
+### ✅ 阶段一：数据基石 (Phase 1: Foundation)
+**目标**：建立数据模型与配置加载系统。
+*   [x] **1.1 配置系统**: 实现 `ComponentConfig` 和 `BlueprintConfig`，能够从 YML 读取数据并缓存到内存。
+*   [x] **1.2 NBT 适配器**: 实现 `PDCAdapter`，支持将 `IronHeartWeapon` 对象序列化为 JSON 并存入 ItemStack PDC。
+*   [x] **1.3 核心模型**: 定义 `WeaponComponent` (组件) 和 `IronHeartWeapon` (武器) 的 Java 类结构。
+*   **交付物**：`/ih test item <blueprint>` 指令，可生成一把带有完整 NBT 数据的测试武器。
+
+### 🛠️ 阶段二：组装台交互 (Phase 2: Assembler Interaction)
+**目标**：实现可视化的 GUI 交互框架。
+*   [x] **2.1 状态机**: 实现 `GUIStateSession`，管理 IDLE (空闲) / FABRICATION (制造) / MODIFICATION (改装) 状态。
+*   [x] **2.2 配方书**: 开发 `BlueprintSelector`，允许玩家点击选择蓝图。
+*   [x] **2.3 幻影渲染**: 在 `AssemblerGUI` 中实现“幻影物品”显示，指引玩家放置组件。
+*   **交付物**：能够打开组装台，选择蓝图，并看到正确的组件槽位高亮。
+
+### ⚙️ 阶段三：核心逻辑 (Phase 3: Logic & Mechanics)
+**目标**：实现数值计算与制造/改装逻辑。
+*   [x] **3.1 构造值校验**: 实现 `IntegrityValidator`，实时计算并限制组件安装。
+*   [x] **3.2 属性计算**: 编写 `StatCalculator`，实现 `Base + Component + Resonance` 的计算公式。
+*   [x] **3.3 制造执行**: 完成“点击确认 -> 消耗材料 -> 生成成品”的完整闭环。
+*   [x] **3.4 改装协议**: 实现“硬绑定销毁”与“软绑定概率回收”的物理逻辑。
+*   **交付物**：功能完整的组装台，可以制造和改装武器，且属性计算正确。
+
+### ♻️ 阶段四：经济闭环 (Phase 4: Economy & Integration)
+**目标**：接入服务器经济与资源循环。
+*   [x] **4.1 废料系统**: 实现组件销毁时产出 `StarryScrap` 的逻辑。
+*   [ ] **4.2 外部集成**: (预留) 对接合金锻炉的组件生产接口。
+*   **交付物**：改装失败后会正确返还废料，且废料可被熔炼。
+
+### 🎵 阶段五：灵魂注入 (Phase 5: Polish & Soul)
+**目标**：提升手感与叙事深度。
+*   [ ] **5.1 工业交响曲**: 添加 GUI 操作音效 (放置、取下、锻造成功)。
+*   [ ] **5.2 动态 Lore**: 实现 `LoreBuilder`，实时生成包含属性、组件列表和历战铭文的描述。
+*   [ ] **5.3 历战系统**: 实现战斗监听与“老兵/传奇”进化逻辑。
+*   **交付物**：最终成品的打磨版本，包含音效与视觉特效。
+
+---
+
+## 5. 风险控制 (Risk Management)
+1.  **NBT 数据膨胀**: 严格控制 JSON 大小，仅存储 ID 和必要数值，描述性文本一律动态生成。
+2.  **并发安全**: GUI 操作虽在主线程，但需注意防止刷物品（如背包满时的返还逻辑）。
+3.  **版本迁移**: 组件 ID 一旦定型严禁修改，否则会导致旧存档物品失效。

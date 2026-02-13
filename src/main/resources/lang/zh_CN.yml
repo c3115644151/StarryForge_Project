@@ -57,6 +57,9 @@ messages:
       valid: "<green>星魂祭坛结构完整！"
     gui:
       title: "<gradient:#5D3FD3:#00BFFF><b>星魂锻造</b></gradient>"
+      title_menu: "<dark_gray>蓝图选择"
+      title_assembly: "<dark_gray>基础装备蓝图"
+      title_forging: "<dark_gray>神话武器蓝图"
       written: "<green>蓝图已写入: {item}"
       req: "<gray>需要: <white>{item}"
       difficulty: "<gray>难度: <white>{diff}"
@@ -68,11 +71,15 @@ messages:
       unknown_item: "<red>未知物品: {item}"
       blueprint_name: "<aqua>工程蓝图"
       blueprint_lore_target: "<gray>目标: <white>{item}"
-      blueprint_lore_hint: "<dark_gray>右键星魂共振台以放置"
+      blueprint_lore_hint: "<dark_gray>右键星魂共振台/组装台以使用"
+      blueprint_lore_usage: "<gray>用途: <white>放入组装台以组装装备"
+      blueprint_lore_components_header: "<gray>所需组件:"
+      blueprint_lore_component_format: "<dark_gray>- <white>{amount}x {component}"
     hammer:
       needed: "<red>你需要手持锻造锤才能进行锻打！"
     blueprint:
       blank_use: "<red>这张蓝图是空白的。请右键星魂共振台选择图纸。"
+      use_in_air_hint: "<gray>请对着空气右键空白蓝图以选择图纸。"
       written_use: "<gray>手持工程蓝图右键星魂共振台以放置。"
       already_placed: "<red>星魂台上已经放置了蓝图！"
       set: "<green>蓝图已铺展，准备锻造。"
@@ -111,6 +118,34 @@ messages:
       phase_complete: "<yellow>阶段完成！请继续投入材料 ({phase}/{max_phase})"
       summary: "<gray>材料均质: <yellow>{avg} <gray>| QTE修正: {modifier} <gray>| 最终评级: <gold>{final}★"
       visual_complete: "<gradient:gold:yellow>锻造完成</gradient>\n<gray>右键点击取出成品"
+  component_types:
+    head: "通用刃模"
+    spine: "通用脊模"
+    grip: "通用柄模"
+    guard: "通用护模"
+    weight: "通用重模"
+    shaft: "通用杆模"
+    unknown: "未知组件"
+  assembler:
+    gui:
+      title: "<gradient:#FFD700:#FFA500>组装台</gradient>"
+      center_button:
+        name: "<!i><gold>打开配方书"
+        lore:
+          - "<!i><gray>点击选择蓝图"
+          - "<!i><dark_gray>或"
+          - "<!i><gray>放入武器进行改装"
+      current_blueprint: "<!i><aqua>当前蓝图: {name}"
+      requirement: "<!i><red>需要: {amount}x {component}"
+      mode_switch: "<green>进入改装模式 (WIP)"
+  blueprint_selector:
+    gui:
+      title: "<dark_gray>配方书"
+      icon:
+        name_format: "<!i><aqua>{name}"
+        required_header: "<!i><gray>需要组件:"
+        component_format: "<!i><gray> - {name}: {count}"
+        click_hint: "<!i><green>点击选择"
   items:
     vulcan_alloy:
       name: "<gradient:red:gold>神锻合金锭</gradient>"
@@ -191,8 +226,141 @@ messages:
     flux_ring:
       name: "<yellow>永动通量环"
       lore:
-        - "<gray>内部涌动着不稳定能量的环状物。"
-        - "<gray>用于制造充能设备。"
+        - "<gray>能够自动从周围环境中汲取能量。"
+        - "<gray>为附近的机器提供微弱但持续的能源。"
+    # StarryForge Components
+    # HEAD (刃模)
+    standard_iron_blade:
+      name: "<gray>制式·精铁刃"
+      lore:
+        - "<gray>帝国的标准军用规格，万金油，适合新手。"
+    obsidian_shatter_blade:
+      name: "<dark_purple>黑曜·碎骨刃"
+      lore:
+        - "<gray>牺牲攻速与寿命换取极致的单次爆发，俗称“玻璃大炮”。"
+    void_crystal_edge:
+      name: "<light_purple>虚空·晶刺刃"
+      lore:
+        - "<gray>击中敌人时造成真实伤害（无视护甲），但极脆。"
+    mechanical_saw_blade:
+      name: "<red>机械·链锯刃"
+      lore:
+        - "<gray>极高攻速，攻击附带流血效果（DoT）。"
+
+    # SPINE (脊模)
+    standard_steel_spine:
+      name: "<gray>制式·钢骨脊"
+      lore:
+        - "<gray>中规中矩的支撑结构。"
+    dragonbone_spine:
+      name: "<gold>龙骨·狂暴脊"
+      lore:
+        - "<gray>提供大量构造值，同时增加基础攻击力，但减少耐久。"
+    darksteel_spine:
+      name: "<dark_gray>乌钢·重装脊"
+      lore:
+        - "<gray>提供海量构造值，允许挂载超重型配件，但显著降低攻速。"
+    quicksilver_spine:
+      name: "<aqua>水银·灵动脊"
+      lore:
+        - "<gray>提供的构造值较少，但额外增加攻速和移动速度。"
+
+    # SHAFT (杆模)
+    oak_shaft:
+      name: "<gold>橡木·训练杆"
+      lore:
+        - "<gray>基础长柄，无特殊属性。"
+    reinforced_iron_pole:
+      name: "<gray>精铁·加固杆"
+      lore:
+        - "<gray>略微增加攻击距离，减少攻速。"
+    shadow_fiber_pole:
+      name: "<dark_purple>暗影·纤维杆"
+      lore:
+        - "<gray>大幅增加攻击距离，且不降低攻速，极难获得。"
+    hydraulic_piston_pole:
+      name: "<red>液压·伸缩杆"
+      lore:
+        - "<gray>蓄力攻击时攻击距离翻倍。"
+
+    # GUARD (护模)
+    standard_cross_guard:
+      name: "<gray>制式·十字格"
+      lore:
+        - "<gray>提供微量护甲。"
+    energy_field_emitter:
+      name: "<aqua>力场·偏折盾"
+      lore:
+        - "<gray>几率完全抵挡一次远程攻击（Projectiles）。"
+    spiked_knuckle_guard:
+      name: "<red>刺环·格斗格"
+      lore:
+        - "<gray>增加近战反伤（Thorns），稍微增加攻击力。"
+    gravity_dampener:
+      name: "<dark_blue>重力·阻尼器"
+      lore:
+        - "<gray>大幅减少击退（Knockback Resistance）。"
+
+    # GRIP (柄模)
+    leather_wrapped_grip:
+      name: "<gold>皮革·缠绕柄"
+      lore:
+        - "<gray>基础手感，微量增加攻速。"
+    tactical_rubber_grip:
+      name: "<gray>战术·防滑柄"
+      lore:
+        - "<gray>防止武器被缴械（Disarm Immune），增加切换速度。"
+    magnetic_glove_interface:
+      name: "<aqua>磁吸·接口柄"
+      lore:
+        - "<gray>武器投掷后自动飞回手中（Loyalty）。"
+    overclock_circuit_grip:
+      name: "<red>超频·回路柄"
+      lore:
+        - "<gray>主动技能冷却时间减少 20%，但每次使用技能消耗耐久。"
+
+    # WEIGHT (重模)
+    meteorite_breaker:
+      name: "<dark_purple>陨铁·破阵锤"
+      lore:
+        - "<gray>大幅增加破盾能力（对盾牌伤害加倍），极大降低攻速。"
+    hawkeye_lens:
+      name: "<gold>鹰眼·瞄准镜"
+      lore:
+        - "<gray>增加暴击率（Critical Chance）。"
+    alchemical_injector:
+      name: "<green>炼金·注射阀"
+      lore:
+        - "<gray>攻击时几率施加中毒或虚弱。"
+    gyroscopic_stabilizer:
+      name: "<blue>陀螺·稳定仪"
+      lore:
+        - "<gray>攻击时的移动速度惩罚减少。"
+    # Universal Components
+    component_edge:
+      name: "<white>通用刃模"
+      lore:
+        - "<gray>基础的金属刃模。"
+    component_spine:
+      name: "<white>通用脊模"
+      lore:
+        - "<gray>基础的金属脊模。"
+    component_guard:
+      name: "<white>通用护模"
+      lore:
+        - "<gray>基础的金属护模。"
+    component_shaft:
+      name: "<white>通用杆模"
+      lore:
+        - "<gray>基础的金属杆模。"
+    component_grip:
+      name: "<white>通用柄模"
+      lore:
+        - "<gray>基础的握柄模具。"
+    component_weight:
+      name: "<white>通用重模"
+      lore:
+        - "<gray>基础的配重模具。"
     frostheart:
       name: "<b:aqua>极寒霜心"
       lore:
@@ -250,6 +418,50 @@ messages:
       lore:
         - "<gray>锻造完成的中间产物。"
         - "<gray>需要在注灵台上进行最终定型。"
+
+    # IronHeart Smithing Items
+    assembly_table:
+      name: "<gradient:#FFD700:#FFA500>组装台</gradient>"
+      lore:
+        - "<gray>用于将标准组件组装成武器的基础设施。"
+        - "<gray>需要配合<blue>蓝图</blue>使用。"
+    
+    component_edge:
+      name: "<white>通用刃模</white>"
+      lore:
+        - "<gray>构成武器的杀伤主体。"
+        - "<dark_gray>基础伤害模组"
+    
+    component_spine:
+      name: "<white>通用脊模</white>"
+      lore:
+        - "<gray>构成武器的支撑结构。"
+        - "<dark_gray>耐久度与刚性"
+    
+    component_guard:
+      name: "<white>通用护模</white>"
+      lore:
+        - "<gray>构成手部防护结构。"
+        - "<dark_gray>格挡判定与防御系数"
+    
+    component_shaft:
+      name: "<white>通用杆模</white>"
+      lore:
+        - "<gray>构成武器的长度延伸。"
+        - "<dark_gray>攻击距离范围"
+    
+    component_grip:
+      name: "<white>通用柄模</white>"
+      lore:
+        - "<gray>构成手持接触面。"
+        - "<dark_gray>基础攻速与耐力消耗"
+    
+    component_weight:
+      name: "<white>通用重模</white>"
+      lore:
+        - "<gray>构成重心调节结构。"
+        - "<dark_gray>削韧值与冲击力"
+
     # Forging Products
     star_steel_helmet:
       name: "<aqua>星陨面甲"
@@ -358,4 +570,3 @@ messages:
     list_item_tooltip: "<green>点击获取"
     no_console: "<red>只有玩家可以使用此命令。"
     visualize_noise_start: "<green>正在生成噪声可视化场..."
-

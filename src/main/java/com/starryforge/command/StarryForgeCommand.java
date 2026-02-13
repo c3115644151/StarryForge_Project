@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.starryforge.features.ironheart.config.BlueprintConfig;
+
 public class StarryForgeCommand implements CommandExecutor, TabCompleter {
 
     private final StarryForge plugin;
@@ -49,6 +51,8 @@ public class StarryForgeCommand implements CommandExecutor, TabCompleter {
                 return handleCEDebug(sender, args);
             case "give":
                 return handleGive(sender, args);
+            case "blueprint":
+                return handleBlueprint(sender, args);
             case "list":
                 if (sender.hasPermission("starryforge.admin")) {
                     sender.sendMessage(MiniMessage.miniMessage()
@@ -63,6 +67,44 @@ public class StarryForgeCommand implements CommandExecutor, TabCompleter {
                 break;
             case "visualizenoise":
                 return handleVisualizeNoise(sender);
+        }
+        return true;
+    }
+
+    private boolean handleBlueprint(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(
+                    MiniMessage.miniMessage().deserialize(plugin.getConfigManager().getMessage("commands.no_console")));
+            return true;
+        }
+
+        if (args.length < 2) {
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Usage: /sf blueprint <blueprint_id>"));
+            return true;
+        }
+
+        String id = args[1].toLowerCase();
+        // Update to IronHeartManager
+        // For Phase 1 migration, createBlueprintItem is not available directly on
+        // BlueprintConfig.
+        // We will just verify it exists for now and give a dummy item or reimplement
+        // logic.
+        // Re-implementing basic logic here for Phase 1.
+        BlueprintConfig.Blueprint bp = plugin.getIronHeartManager().getBlueprintConfig().getBlueprint(id);
+
+        if (bp != null) {
+            ItemStack item = new ItemStack(Material.PAPER); // Placeholder
+            ItemMeta meta = item.getItemMeta();
+            meta.displayName(MiniMessage.miniMessage().deserialize("<aqua>" + bp.displayName()));
+            // Set PDC for identification
+            com.starryforge.features.core.PDCManager.setString(item, com.starryforge.utils.Keys.BLUEPRINT_TARGET, id);
+            item.setItemMeta(meta);
+
+            player.getInventory().addItem(item).values()
+                    .forEach(drop -> player.getWorld().dropItemNaturally(player.getLocation(), drop));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Given blueprint: " + id));
+        } else {
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Unknown blueprint ID: " + id));
         }
         return true;
     }
@@ -108,16 +150,6 @@ public class StarryForgeCommand implements CommandExecutor, TabCompleter {
 
         if (sender instanceof Player player) {
             if (player.hasPermission("starryforge.debug")) {
-                // Assuming DebugStickManager is accessible somehow or we need to add a getter
-                // Since DebugStickManager is private and has no getter in StarryForge, we might
-                // need to add one or rethink access.
-                // Assuming for now we added a getter or public access.
-                // Wait, checking StarryForge.java... debugStickManager is private and NO
-                // getter.
-                // I will need to add a getter for DebugStickManager to StarryForge.java as
-                // well.
-                // For now, I will comment this out or assume the getter will be added.
-                // Actually, checking standard practices, I should add the getter.
                 plugin.getDebugStickManager().giveDebugStick(player);
                 return true;
             }
@@ -342,13 +374,20 @@ public class StarryForgeCommand implements CommandExecutor, TabCompleter {
             }
             if (sender.hasPermission("starryforge.admin")) {
                 completions.add("give");
+                completions.add("blueprint");
                 completions.add("list");
                 completions.add("reload");
             }
             return completions.stream().filter(s -> s.startsWith(args[0].toLowerCase())).collect(Collectors.toList());
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("give")) {
-            if (sender.hasPermission("starryforge.admin")) {
+        } else if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("give") && sender.hasPermission("starryforge.admin")) {
                 return plugin.getItemManager().getItemNames().stream().filter(s -> s.startsWith(args[1].toUpperCase()))
+                        .collect(Collectors.toList());
+            }
+            if (args[0].equalsIgnoreCase("blueprint") && sender.hasPermission("starryforge.admin")) {
+                return plugin.getIronHeartManager().getBlueprintConfig().getAllBlueprints().stream()
+                        .map(BlueprintConfig.Blueprint::id)
+                        .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
                         .collect(Collectors.toList());
             }
         }

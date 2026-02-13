@@ -1,0 +1,39 @@
+resonance:
+  # ==========================================================
+  # IronHeart Resonance Configuration
+  # Define set bonuses for specific component combinations
+  # ==========================================================
+
+  # Example: Frost Set (Slows enemies?)
+  FROST_ECHO:
+    display_name: "Frost Echo"
+    color: "<blue>"
+    required_components:
+      - "FROSTBITE_BLADE"
+      # Add more frost components here when defined
+    bonus_stats:
+      damage: 1.0
+      speed: 0.1
+    hidden_lore: "Chill to the bone..."
+
+  # Example: Heavy Hitter (High Dmg, Low Speed)
+  VOLCANIC_WRATH:
+    display_name: "Volcanic Wrath"
+    color: "<red>"
+    required_components:
+      - "VULCAN_SUNDERER"
+    bonus_stats:
+      damage: 4.0
+      speed: -0.2
+    hidden_lore: "The earth trembles."
+
+  # Example: Starfall (Balanced)
+  STARFALL_GRACE:
+    display_name: "Starfall Grace"
+    color: "<aqua>"
+    required_components:
+      - "STARFALL_EDGE"
+    bonus_stats:
+      speed: 0.2
+      reach: 0.5
+    hidden_lore: "Swift as a falling star."
